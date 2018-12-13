@@ -1,44 +1,41 @@
-package com.iou.Screens;
+package com.iou;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.iou.IOU;
-import com.iou.Player;
 
-public class PlayScreen implements Screen, InputProcessor {
-    final IOU game;
-    private Stage stage;
-    private final Viewport viewport;
-    World main_world;
+import java.util.ArrayList;
+
+
+public class Player extends Sprite implements InputProcessor {
+    World world;
     Body player_body;
-    static Player player;
-    OrthographicCamera camera;
+    Sprite player_sprite;
+    // speed and jump_force are being used with applyLinearImpulse, so they are both velocities, in m/s.
+    float speed = 5;
+    float jump_force = 2.5f;
+    ArrayList< Integer > allkeysPressed = new ArrayList< Integer >( 3 );
+    boolean keypressed = false, jumping = true, onGround = false;
+    int left_center_right = 0;// -1 left    0 center   +1 right
+    BodyDef bullet_bodyDef;
+    ArrayList< Body > bullet_bodies;
 
-    public PlayScreen( IOU the_game)
+    public Player(World w)
     {
-        game= the_game;
-        camera = new OrthographicCamera();
-        this.viewport = new FitViewport(IOU.WIDTH, IOU.HEIGHT, new OrthographicCamera());
-        stage = new Stage(viewport, game.batch);
-        Gdx.input.setInputProcessor(stage);
-        // create a world
-        main_world = new World( new Vector2( 0, -20f ), true );
+        world= w;
+        player_sprite = new Sprite(new Texture( Gdx.files.internal( "badlogic.jpg" ) ));
+    }
 
-        if(player == null)
-            player = new Player(main_world);
-
-        Gdx.input.setInputProcessor( this );  // Required for implementing 'InputProcessor'
-        print("Inside playscreen");
+    //assuming that the batch has begun and ended before calling this method
+    public void draw_me( Batch batch)
+    {
+        player_sprite.draw( batch );
     }
 
     public static void print( String s )
@@ -46,53 +43,13 @@ public class PlayScreen implements Screen, InputProcessor {
         System.out.println( s );
     }
 
-
-    @Override
-    public void render(float value)
-    {
-        Gdx.gl.glClearColor(255,255,255,1);//white
-        //Gdx.gl.glClearColor(.5f,.5f,.5f,0.1f);//black
-        Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT);
-
-        camera.update();
-        main_world.step(1f/60f, 6, 2);
-
-        stage.draw();
-        game.batch.begin();
-            player.draw_me( game.batch );
-            //TODO: JUST FOR TESTING. DELETE LATER
-        game.batch.end();
-
-
-    }
-
-    @Override
-    public void show()
-    {}
-
     //"Called when a key was pressed"
     @Override
     public boolean keyDown(int keycode) {
 
-        print("the keycode: "+ keycode);
-        if(keycode == Input.Keys.ESCAPE)
-        {
-            pause();
-        }
-
-        //TODO: to test changing back to other screen. delete later.
-        if(keycode == Input.Keys.NUM_0 || keycode == Input.Keys.NUMPAD_0)
-        {
-            print("pressing 0");
-            game.setScreen(new StartScreen(game));
-            dispose();
-        }
-
-
-        /*
         if(keycode == Input.Keys.SPACE && onGround)
         {
-            print("Trying to jump");
+            //print("Trying to jump");
             //player_body.setLinearVelocity(0f,80000f);
             //player_body.setLinearVelocity(speed*left_center_right,jump_force);
             player_body.applyLinearImpulse( speed*left_center_right, jump_force,
@@ -122,16 +79,19 @@ public class PlayScreen implements Screen, InputProcessor {
         {
             create_bullet();
         }
-        */
+
         return false;
     }
 
+    public void create_bullet()
+    {
+        print("CHANGE ME");//TODO: change this
+    }
 
     //"Called when a key was released"
     @Override
     public boolean keyUp(int keycode)
     {
-        /*
         print("jumping: "+ jumping +"\tOnGround: "+ onGround);
         int index = allkeysPressed.indexOf( keycode );
         if(index != -1)
@@ -147,9 +107,9 @@ public class PlayScreen implements Screen, InputProcessor {
 		{
 			jumping= true;
 			onGround = false;
-		}* /
+		}*/
 
-        print("\tAfter: jumping: "+ jumping +"\tOnGround: "+ onGround);*/
+        print("\tAfter: jumping: "+ jumping +"\tOnGround: "+ onGround);
         return true;
     }
 
@@ -184,20 +144,4 @@ public class PlayScreen implements Screen, InputProcessor {
     public boolean scrolled(int amount) {
         return false;
     }
-
-    @Override
-    public void resize(int width, int height){}
-
-    @Override
-    public void pause() {}
-
-    @Override
-    public void resume() {}
-
-    @Override
-    public void hide() {}
-
-    @Override
-    public void dispose() {}
-
 }

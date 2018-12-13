@@ -31,7 +31,7 @@ public class InstructionsScreen implements Screen {
 
     public InstructionsScreen(IOU game){
         this.game = game;
-        this.viewport = new FitViewport(IOU.WIDTH, IOU.HEIGHT, new OrthographicCamera());
+        viewport = new FitViewport(IOU.WIDTH, IOU.HEIGHT, new OrthographicCamera());
         stage = new Stage(viewport, game.batch);
         Gdx.input.setInputProcessor(stage);
     }

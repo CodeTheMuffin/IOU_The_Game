@@ -10,7 +10,8 @@ public class IOU extends Game{
 
     public static final int WIDTH = 800;
     public static final int HEIGHT = 480;
-    public static final float PPM = 32;//pixels per meter
+    public static final float PIXELS_PER_METER = 32;
+
 
     public static AssetManager assetManager;
 

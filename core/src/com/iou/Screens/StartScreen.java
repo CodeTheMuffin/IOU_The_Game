@@ -31,11 +31,14 @@ public class StartScreen implements Screen {
     Label instructionsLabel;
     Label quitLabel;
     Sprite img_delte_me;
+    OrthographicCamera camera;
 
     public StartScreen(IOU the_game)
     {
         game= the_game;
-        viewport = new FitViewport( IOU.WIDTH, IOU.HEIGHT, new OrthographicCamera() );
+        //Gdx.graphics.getWidth(), Gdx.graphics.getHeight()
+        camera = new OrthographicCamera(IOU.WIDTH, IOU.HEIGHT);
+        viewport = new FitViewport( IOU.WIDTH, IOU.HEIGHT, camera );
         stage = new Stage(viewport, game.batch);
         Gdx.input.setInputProcessor( stage );
         img_delte_me = new Sprite(new Texture( Gdx.files.internal( "badlogic.jpg" ) ));
