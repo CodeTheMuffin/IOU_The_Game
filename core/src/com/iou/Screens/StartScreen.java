@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.iou.IOU;
+import com.iou.The_Main_Game_Class;
 
 
 public class StartScreen implements Screen {
@@ -26,6 +27,9 @@ public class StartScreen implements Screen {
     private Viewport viewport;
     private Stage stage;
     Label lbl_example;
+    Label startLabel;
+    Label instructionsLabel;
+    Label quitLabel;
     Sprite img_delte_me;
 
     public StartScreen(IOU the_game)
@@ -72,29 +76,46 @@ public class StartScreen implements Screen {
         parameter.size = 26;
 
         final BitmapFont font = generator.generateFont(parameter);
-        lbl_example = new Label("This is an example", new Label.LabelStyle(font, Color.BLACK));
 
-        lbl_example.setPosition(50,30);
-        lbl_example.setTouchable( Touchable.enabled);
-        lbl_example.setBounds(50,30,lbl_example.getWidth(),lbl_example.getHeight());
 
-        //to set background color
-        //based on: https://stackoverflow.com/questions/18166556/how-to-change-the-color-of-the-background-in-libgdx-labels
-        Pixmap labelColor =new Pixmap((int)lbl_example.getWidth(), (int)lbl_example.getHeight(), Pixmap.Format.RGB888);
-        labelColor.setColor(Color.WHITE);
-        labelColor.fill();
-        lbl_example.getStyle().background = new Image(new Texture(labelColor)).getDrawable();
-
-        lbl_example.addListener(new ClickListener() {
+        startLabel = new Label("Start Game", new Label.LabelStyle(font, Color.BLACK));
+        startLabel.setPosition(325,300);
+        startLabel.setTouchable(Touchable.enabled);
+        startLabel.setBounds(325,300,startLabel.getWidth(),startLabel.getHeight());
+        startLabel.addListener(new ClickListener(){
             @Override
-            public void clicked( InputEvent event, float x, float y) {
-                print("Example label clicked!");
+            public void clicked(InputEvent event,float x, float y ){
                 game.setScreen(new PlayScreen(game));
                 dispose();
             }
         });
 
-        stage.addActor( lbl_example );
+        instructionsLabel = new Label("Instructions", new Label.LabelStyle(font, Color.BLACK));
+        instructionsLabel.setPosition(315,250);
+        instructionsLabel.setTouchable(Touchable.enabled);
+        instructionsLabel.setBounds(315 ,250, instructionsLabel.getWidth(),instructionsLabel.getHeight());
+        instructionsLabel.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y){
+                game.setScreen(new InstructionsScreen(game));
+                dispose();
+            }
+        });
+
+        quitLabel = new Label("Quit", new Label.LabelStyle(font, Color.BLACK));
+        quitLabel.setPosition(383,200);
+        quitLabel.setTouchable(Touchable.enabled);
+        quitLabel.setBounds(383,200,quitLabel.getWidth(),quitLabel.getHeight());
+        quitLabel.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y){
+                Gdx.app.exit();
+            }
+        });
+
+        stage.addActor(startLabel);
+        stage.addActor(instructionsLabel);
+        stage.addActor(quitLabel);
         print("this is the end");
     }
 
@@ -112,6 +133,8 @@ public class StartScreen implements Screen {
 
     @Override
     public void dispose() {
-        lbl_example.setTouchable( Touchable.disabled);
+        startLabel.setTouchable(Touchable.disabled);
+        instructionsLabel.setTouchable(Touchable.disabled);
+        quitLabel.setTouchable(Touchable.disabled);
     }
 }
