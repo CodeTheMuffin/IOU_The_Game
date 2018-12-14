@@ -8,8 +8,8 @@ import com.iou.IOU;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.height = 600;
-		config.width= 1000;
+		config.height = IOU.HEIGHT;//600
+		config.width= IOU.WIDTH;//1000
 		//new LwjglApplication(new The_Main_Game_Class(), config);
 		new LwjglApplication(new IOU(),config);
 	}

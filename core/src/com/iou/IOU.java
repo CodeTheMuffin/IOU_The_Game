@@ -8,10 +8,9 @@ import com.iou.Screens.StartScreen;
 public class IOU extends Game{
     public SpriteBatch batch;
 
-    public static final int WIDTH = 800;
-    public static final int HEIGHT = 480;
-    public static final float PIXELS_PER_METER = 32;
-
+    public static final int WIDTH = 1000;//800
+    public static final int HEIGHT = 800;//480
+    public static final float PIXELS_PER_METER = 100;//32
 
     public static AssetManager assetManager;
 
@@ -24,6 +23,11 @@ public class IOU extends Game{
         assetManager.finishLoading();
         this.setScreen(new StartScreen(this));
 
+    }
+
+    public static final void print( String s )
+    {
+        System.out.println( s );
     }
 
     public void render(){
