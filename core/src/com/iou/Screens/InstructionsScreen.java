@@ -17,6 +17,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.iou.IOU;
 
+import static com.iou.IOU.print;
+
 
 public class InstructionsScreen implements Screen {
     final IOU game;
@@ -36,12 +38,10 @@ public class InstructionsScreen implements Screen {
         viewport = new FitViewport(IOU.WIDTH, IOU.HEIGHT, new OrthographicCamera());
         stage = new Stage(viewport, game.batch);
         Gdx.input.setInputProcessor(stage);
-    }
 
-    @Override
-    public void show() {
+        //below was in show()
         background = new Texture("badlogic.jpg");
-
+        print("Inside Instrcution Screen");
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal
                 ("fonts/Letters_for_Learners/Letters for Learners.ttf"));
@@ -50,8 +50,6 @@ public class InstructionsScreen implements Screen {
         final BitmapFont font = generator.generateFont(parameter);
         //generator.dispose();
 
-
-
         returnMain = new Label("Return to Main Menu", new Label.LabelStyle(font, Color.BLACK));
         returnMain.setPosition(IOU.WIDTH/10,50);
         returnMain.setTouchable(Touchable.enabled);
@@ -59,8 +57,10 @@ public class InstructionsScreen implements Screen {
         returnMain.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
-                game.setScreen(new StartScreen(game));
-                dispose();
+                game.setScreen( IOU.get_StartScreen( game ) );
+                //game.setScreen( IOU.main_startScreen );
+                //game.setScreen(new StartScreen(game));
+                //dispose();
             }
         });
 
@@ -71,8 +71,9 @@ public class InstructionsScreen implements Screen {
         next.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
-                game.setScreen(new NextInstructionsScreen(game));
-                dispose();
+                game.setScreen( IOU.get_NextInstructionScreen( game ) );
+                //game.setScreen(new NextInstructionsScreen(game));
+                //dispose();//since we are reusing this screen, don't dispose of anything!
             }
         });
 
@@ -93,7 +94,6 @@ public class InstructionsScreen implements Screen {
         collectProjects = new Label("Collect the projects by touching them with the\n player", new Label.LabelStyle(font, Color.BLACK));
         collectProjects.setPosition(IOU.WIDTH/3,IOU.HEIGHT/2-150);
 
-
         stage.addActor(greetings);
         stage.addActor(intro);
         stage.addActor(attackControls);
@@ -101,6 +101,11 @@ public class InstructionsScreen implements Screen {
         stage.addActor(returnMain);
         stage.addActor(collectProjects);
         stage.addActor(next);
+    }
+
+    @Override
+    public void show() {
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
@@ -121,19 +126,13 @@ public class InstructionsScreen implements Screen {
     }
 
     @Override
-    public void pause() {
-
-    }
+    public void pause() { }
 
     @Override
-    public void resume() {
-
-    }
+    public void resume() { }
 
     @Override
-    public void hide() {
-
-    }
+    public void hide() { }
 
     @Override
     public void dispose() {

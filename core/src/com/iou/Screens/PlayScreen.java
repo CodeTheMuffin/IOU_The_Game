@@ -35,9 +35,11 @@ public class PlayScreen implements Screen, InputProcessor {
     static Player player;
     OrthographicCamera camera;
     Wall floor, left_wall, right_wall, ceiling;
+    public boolean isPaused = false;
 
     public PlayScreen( IOU the_game)
     {
+        print("In the Playscreen");
         game= the_game;
         camera = new OrthographicCamera();
         this.viewport = new FitViewport(IOU.WIDTH, IOU.HEIGHT, new OrthographicCamera());
@@ -57,8 +59,9 @@ public class PlayScreen implements Screen, InputProcessor {
         right_wall  = new Wall(player, Wall.wall_position.RIGHT);
         ceiling     = new Wall(player, Wall.wall_position.UP);
 
-        print("screen width: "+ Gdx.graphics.getWidth()+"\theight: "+ Gdx.graphics.getHeight());
+        //print("screen width: "+ Gdx.graphics.getWidth()+"\theight: "+ Gdx.graphics.getHeight());
         CreateContactListener();
+        IOU.set_PlayScreen( this );
     }
 
     @Override
@@ -71,7 +74,8 @@ public class PlayScreen implements Screen, InputProcessor {
         camera.update();
 
         //recommended default values (1/60, 6,2)
-        main_world.step(1f/60f, 6, 2);
+        if (!isPaused)//if NOT paused, then simulate physics (via run step/frame)
+            main_world.step(1f/60f, 6, 2);
 
         stage.draw();
         game.batch.begin();
@@ -89,15 +93,22 @@ public class PlayScreen implements Screen, InputProcessor {
                 pencil.draw_me(game.batch);
                 //pencil.get_Pencil_sprite().draw( game.batch );
             }
-            //TODO: JUST FOR TESTING. DELETE LATER
         game.batch.end();
     }
 
-
-
+    /*
+        this gets called when the game focuses on the play Screen (once per game refocus)
+        So when the game goes from start screen to play screen
+        typically this would be solved at the start of the game, however, after redirecting to from
+        start -> play -> pause -> start -> play
+        I was not able to press a button when in the play screen after the above steps
+    */
     @Override
     public void show()
-    {}
+    {
+        Gdx.input.setInputProcessor( this );//refocus the game's input on this screen
+        isPaused = false;// play the game
+    }
 
     // to be called only in the constructor
     void CreateContactListener()
@@ -178,7 +189,8 @@ public class PlayScreen implements Screen, InputProcessor {
         print("the keycode: "+ keycode);
         if(keycode == Input.Keys.ESCAPE)
         {
-            pauseMenu = new PausePopUp(stage,game);
+            print("Pressing ESC");
+            //pauseMenu = new PausePopUp(stage,game, this);
             pause();
         }
 
@@ -186,12 +198,14 @@ public class PlayScreen implements Screen, InputProcessor {
         if(keycode == Input.Keys.NUM_0 || keycode == Input.Keys.NUMPAD_0)
         {
             print("pressing 0");
-            game.setScreen(new StartScreen(game));
+            //game.setScreen(new StartScreen(game));
+            //game.setScreen( IOU.main_startScreen );
+            game.setScreen( IOU.get_StartScreen( game ) );
             dispose();
         }
 
 
-        player.keyDown( keycode );//needed for player's input
+        player.keyDown( keycode, isPaused );//needed for player's input
 
         return false;
     }
@@ -201,7 +215,8 @@ public class PlayScreen implements Screen, InputProcessor {
     @Override
     public boolean keyUp(int keycode)
     {
-        player.keyDown( keycode );//needed for player's input
+        //player.keyDown( keycode );//needed for player's input
+        player.keyUp( keycode, isPaused );
         return true;
     }
 
@@ -240,16 +255,37 @@ public class PlayScreen implements Screen, InputProcessor {
     @Override
     public void resize(int width, int height){}
 
+    //pauses when the user presses 'ESC' OR when the user clicks outside of the window.
     @Override
-    public void pause() {}
+    public void pause() {
+        isPaused = true;
+        //gets rid of duplicate dialogs boxes, which could occur when pausing and clicking outside the window
+        if(pauseMenu != null)
+        {
+            pauseMenu.RemoveDialog();
+            pauseMenu = null;
+        }
 
+        pauseMenu = new PausePopUp(stage,game, this);
+    }
+
+    //resumes when the user click 'Resume' in dialog box OR when user clicks back inside the window
     @Override
-    public void resume() {}
+    public void resume() {
+        isPaused = false;
+        //print("is popup up?: "+ (pauseMenu!=null));
+        if(pauseMenu != null)
+        {
+            pauseMenu.RemoveDialog();
+            pauseMenu = null;
+        }
+    }
 
     @Override
     public void hide() {}
 
     @Override
-    public void dispose() {}
+    public void dispose() {
+    }
 
 }

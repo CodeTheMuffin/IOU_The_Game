@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.iou.IOU;
+import static com.iou.IOU.print;
 
 public class NextInstructionsScreen implements Screen {
     public final IOU game;
@@ -32,9 +33,9 @@ public class NextInstructionsScreen implements Screen {
         viewport = new FitViewport(IOU.WIDTH,IOU.HEIGHT, new OrthographicCamera());
         stage = new Stage(viewport, game.batch);
         Gdx.input.setInputProcessor(stage);
-    }
-    @Override
-    public void show() {
+
+
+        //below was in show()
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal
                 ("fonts/Letters_for_Learners/Letters for Learners" +
                         ".ttf"));
@@ -49,7 +50,7 @@ public class NextInstructionsScreen implements Screen {
         caffeineMechanic.setPosition(IOU.WIDTH/8,300);
 
         LevelComplete = new Label("Once a level is complete the total debit remaining will be calculated\n and the interest shall be applied for the next level."
-        , new Label.LabelStyle(font, Color.BLACK));
+                , new Label.LabelStyle(font, Color.BLACK));
         LevelComplete.setPosition(IOU.WIDTH/8, 200);
 
         prev = new Label("Previous", new Label.LabelStyle(font, Color.BLACK));
@@ -59,8 +60,10 @@ public class NextInstructionsScreen implements Screen {
         prev.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new InstructionsScreen(game));
-                dispose();
+                print("\tTrying to Return to Pre Menu");
+                game.setScreen( IOU.get_InstructionScreen( game ) );
+                //game.setScreen(new InstructionsScreen(game));
+                //dispose();//since we are reusing this screen, don't dispose of anything!
             }
         });
 
@@ -71,8 +74,10 @@ public class NextInstructionsScreen implements Screen {
         returnMenu.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
-                game.setScreen(new StartScreen(game));
-                dispose();
+                print("\tTrying to Return to Main Menu");
+                game.setScreen( IOU.get_StartScreen( game ) );//reuse the Start screen
+                //game.setScreen(new StartScreen(game));
+                //dispose();
             }
         });
 
@@ -80,6 +85,10 @@ public class NextInstructionsScreen implements Screen {
         stage.addActor(LevelComplete);
         stage.addActor(prev);
         stage.addActor(returnMenu);
+    }
+    @Override
+    public void show() {
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override

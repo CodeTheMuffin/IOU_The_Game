@@ -139,7 +139,8 @@ public class Wall {
         wall_body.createFixture( fixtureDef );
         wall_sprite.setSize( wall_width,wall_height );
         //wall_sprite.setPosition( wall_body.getPosition().x, wall_body.getPosition().y );
-        print("Wall h: "+ wall_height+ "\tw: "+wall_width+"\tx: "+wall_x +"\ty: "+ wall_y);
+
+        //print("Wall h: "+ wall_height+ "\tw: "+wall_width+"\tx: "+wall_x +"\ty: "+ wall_y);
 
         //set the wall's object to the body's UserData to make it easier to determine if its a wall object
         // in collision detection

@@ -50,8 +50,9 @@ public class GameOverScreen implements Screen {
         returnMain.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
-                game.setScreen(new StartScreen(game));
-                dispose();
+                game.setScreen( IOU.get_StartScreen( game ) );
+                //game.setScreen(new StartScreen(game));
+                //dispose();
             }
         });
 

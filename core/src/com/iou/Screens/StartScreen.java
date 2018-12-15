@@ -34,6 +34,7 @@ public class StartScreen implements Screen {
     Sprite img_delte_me;
     OrthographicCamera camera;
 
+
     public StartScreen(IOU the_game)
     {
         game= the_game;
@@ -72,62 +73,79 @@ public class StartScreen implements Screen {
     @Override
     public void show()
     {
-        print("is this working?");
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal
-                ("fonts/Letters_for_Learners/Letters for Learners" +
-                ".ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 26;
+        String startText = "";
 
-        final BitmapFont font = generator.generateFont(parameter);
-
-        title = new Label("IOU", new Label.LabelStyle(font,Color.BLACK));
-        title.setPosition(IOU.WIDTH/2-50, IOU.HEIGHT/2+50);
+        if ( IOU.isPlayScreenCreated() )
+            startLabel.setText( "Resume Game" );
+        else
+            startText = " Start Game";//add space to make things look decent when changing text
 
 
-        startLabel = new Label("Start Game", new Label.LabelStyle(font, Color.BLACK));
-        startLabel.setPosition(IOU.WIDTH/2-70,IOU.HEIGHT/2);
-        startLabel.setTouchable(Touchable.enabled);
-        startLabel.setBounds(IOU.WIDTH/2-70,IOU.HEIGHT/2,startLabel.getWidth(),startLabel.getHeight());
-        startLabel.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event,float x, float y ){
-                game.setScreen(new PlayScreen(game));
-                dispose();
-            }
-        });
+        IOU.areEmpty();
+        if ( title == null )//this prevents things to be recreated and redrawn
+        {
+            FreeTypeFontGenerator generator = new FreeTypeFontGenerator( Gdx.files.internal
+                    ( "fonts/Letters_for_Learners/Letters for Learners" +
+                            ".ttf" ) );
+            FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+            parameter.size = 26;
 
-        instructionsLabel = new Label("Instructions", new Label.LabelStyle(font, Color.BLACK));
-        instructionsLabel.setPosition(IOU.WIDTH/2-75,IOU.HEIGHT/2-50);
-        instructionsLabel.setTouchable(Touchable.enabled);
-        instructionsLabel.setBounds(IOU.WIDTH/2-75 ,IOU.HEIGHT/2-50, instructionsLabel.getWidth(),instructionsLabel.getHeight());
-        instructionsLabel.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y){
-                game.setScreen(new InstructionsScreen(game));
-                dispose();
-            }
-        });
+            final BitmapFont font = generator.generateFont( parameter );
 
-        quitLabel = new Label("Quit", new Label.LabelStyle(font, Color.BLACK));
-        quitLabel.setPosition(IOU.WIDTH/2-50,IOU.HEIGHT/2-100);
-        quitLabel.setTouchable(Touchable.enabled);
-        quitLabel.setBounds(IOU.WIDTH/2-50,IOU.HEIGHT/2-100,quitLabel.getWidth(),quitLabel.getHeight());
-        quitLabel.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y){
-                //testing the gameOver screen
-                game.setScreen(new GameOverScreen(game));
-                //Gdx.app.exit();
-            }
-        });
+            title = new Label( "IOU", new Label.LabelStyle( font, Color.BLACK ) );
+            title.setPosition( IOU.WIDTH / 2 - 50, IOU.HEIGHT / 2 + 50 );
 
-        stage.addActor(title);
-        stage.addActor(startLabel);
-        stage.addActor(instructionsLabel);
-        stage.addActor(quitLabel);
-        print("this is the end");
-    }
+            startLabel = new Label( startText, new Label.LabelStyle( font, Color.BLACK ) );
+            startLabel.setPosition( IOU.WIDTH / 2 - 80, IOU.HEIGHT / 2 );// was 70
+            startLabel.setTouchable( Touchable.enabled );
+            startLabel.setBounds( IOU.WIDTH / 2 - 80, IOU.HEIGHT / 2, startLabel.getWidth(), startLabel.getHeight() );
+            startLabel.addListener( new ClickListener() {
+                @Override
+                public void clicked( InputEvent event, float x, float y )
+                {
+                    game.setScreen( IOU.get_PlayScreen( game ) );
+
+                    //dispose(); don't dispose, because we are going to reuse them!
+                }
+            } );
+
+            instructionsLabel = new Label( "Instructions", new Label.LabelStyle( font, Color.BLACK ) );
+            instructionsLabel.setPosition( IOU.WIDTH / 2 - 75, IOU.HEIGHT / 2 - 50 );
+            instructionsLabel.setTouchable( Touchable.enabled );
+            instructionsLabel.setBounds( IOU.WIDTH / 2 - 75, IOU.HEIGHT / 2 - 50, instructionsLabel.getWidth(), instructionsLabel.getHeight() );
+            instructionsLabel.addListener( new ClickListener() {
+                @Override
+                public void clicked( InputEvent event, float x, float y )
+                {
+                    game.setScreen( new InstructionsScreen( game ) );
+                    //dispose();
+                }
+            } );
+
+            quitLabel = new Label( "Quit", new Label.LabelStyle( font, Color.BLACK ) );
+            quitLabel.setPosition( IOU.WIDTH / 2 - 50, IOU.HEIGHT / 2 - 100 );
+            quitLabel.setTouchable( Touchable.enabled );
+            quitLabel.setBounds( IOU.WIDTH / 2 - 50, IOU.HEIGHT / 2 - 100, quitLabel.getWidth(), quitLabel.getHeight() );
+            quitLabel.addListener( new ClickListener() {
+                @Override
+                public void clicked( InputEvent event, float x, float y )
+                {
+                    //testing the gameOver screen
+                    game.setScreen( new GameOverScreen( game ) );
+                    //Gdx.app.exit();
+                }
+            } );
+
+            stage.addActor( title );
+            stage.addActor( startLabel );
+            stage.addActor( instructionsLabel );
+            stage.addActor( quitLabel );
+            print( "this is the end" );
+
+        }
+        Gdx.input.setInputProcessor( stage );//??Add?
+        //IOU.set_StartScreen( this );
+    }//end of show()
 
     @Override
     public void resize(int width, int height){}
@@ -143,6 +161,7 @@ public class StartScreen implements Screen {
 
     @Override
     public void dispose() {
+        print("I'm called");
         startLabel.setTouchable(Touchable.disabled);
         instructionsLabel.setTouchable(Touchable.disabled);
         quitLabel.setTouchable(Touchable.disabled);

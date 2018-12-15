@@ -156,13 +156,15 @@ public class Player {//implements InputProcessor {
         {
             Player_Pencils.remove( pen );
             main_world.destroyBody( pen.getBody() );
-
         }
     }
 
     //"Called when a key was pressed"
     //@Override
-    public boolean keyDown(int keycode) {
+    public boolean keyDown(int keycode, boolean isPaused) {
+        if (isPaused) //prevent user from pressing buttons when game is paused
+            return false;
+
         if(keycode == Input.Keys.SPACE && onGround)
         {
             //print("Trying to jump");
@@ -238,8 +240,11 @@ public class Player {//implements InputProcessor {
 
     //"Called when a key was released"
     //@Override
-    public boolean keyUp(int keycode)
+    public boolean keyUp(int keycode, boolean isPaused)
     {
+        if(isPaused)
+            return false;
+
         print("jumping: "+ jumping +"\tOnGround: "+ onGround);
         int index = allkeysPressed.indexOf( keycode );
         if(index != -1)
