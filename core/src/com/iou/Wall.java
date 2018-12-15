@@ -17,7 +17,7 @@ import static com.iou.IOU.print;
 public class Wall {
     //determines if its left, right, up or down
     public static enum wall_position{LEFT, RIGHT, UP, DOWN};
-    wall_position curr_wall_position;
+    public wall_position curr_wall_position;
 
     Body wall_body;
     Sprite wall_sprite;

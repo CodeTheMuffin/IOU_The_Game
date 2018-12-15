@@ -41,7 +41,6 @@ public class InstructionsScreen implements Screen {
 
         //below was in show()
         background = new Texture("badlogic.jpg");
-        print("Inside Instrcution Screen");
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal
                 ("fonts/Letters_for_Learners/Letters for Learners.ttf"));

@@ -80,8 +80,6 @@ public class StartScreen implements Screen {
         else
             startText = " Start Game";//add space to make things look decent when changing text
 
-
-        IOU.areEmpty();
         if ( title == null )//this prevents things to be recreated and redrawn
         {
             FreeTypeFontGenerator generator = new FreeTypeFontGenerator( Gdx.files.internal
@@ -140,8 +138,6 @@ public class StartScreen implements Screen {
             stage.addActor( startLabel );
             stage.addActor( instructionsLabel );
             stage.addActor( quitLabel );
-            print( "this is the end" );
-
         }
         Gdx.input.setInputProcessor( stage );//??Add?
         //IOU.set_StartScreen( this );
@@ -161,7 +157,6 @@ public class StartScreen implements Screen {
 
     @Override
     public void dispose() {
-        print("I'm called");
         startLabel.setTouchable(Touchable.disabled);
         instructionsLabel.setTouchable(Touchable.disabled);
         quitLabel.setTouchable(Touchable.disabled);

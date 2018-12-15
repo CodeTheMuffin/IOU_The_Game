@@ -60,7 +60,7 @@ public class NextInstructionsScreen implements Screen {
         prev.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                print("\tTrying to Return to Pre Menu");
+                //print("\tTrying to Return to Pre Menu");
                 game.setScreen( IOU.get_InstructionScreen( game ) );
                 //game.setScreen(new InstructionsScreen(game));
                 //dispose();//since we are reusing this screen, don't dispose of anything!
@@ -74,7 +74,7 @@ public class NextInstructionsScreen implements Screen {
         returnMenu.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
-                print("\tTrying to Return to Main Menu");
+                //print("\tTrying to Return to Main Menu");
                 game.setScreen( IOU.get_StartScreen( game ) );//reuse the Start screen
                 //game.setScreen(new StartScreen(game));
                 //dispose();

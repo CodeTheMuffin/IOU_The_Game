@@ -167,7 +167,7 @@ public class Player {//implements InputProcessor {
 
         if(keycode == Input.Keys.SPACE && onGround)
         {
-            //print("Trying to jump");
+            print("Trying to jump");
             //player_body.setLinearVelocity(0f,80000f);
             //player_body.setLinearVelocity(speed*left_center_right,jump_force);
             player_body.applyLinearImpulse( speed*left_center_right, jump_force,

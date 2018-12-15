@@ -133,9 +133,14 @@ public class PlayScreen implements Screen, InputProcessor {
                 Body player_body = player.getBody();
                 Body floor_body = floor.getBody();
 
+                print("is bodyA the player or ground?: "+ (bodyA==player_body)+"\t"+ (bodyA== floor_body));
+                print("is bodyB the player or ground?: "+ (bodyB==player_body)+"\t"+ (bodyB== floor_body));
 
-                //print("is bodyA the player or ground?: "+ (bodyA==player_body)+"\t"+ (bodyA== ground_body));
-                //print("is bodyB the player or ground?: "+ (bodyB==player_body)+"\t"+ (bodyB== ground_body));
+                if(bodyB.getUserData().getClass() == Wall.class)
+                {
+                    print("\tIt's a: "+ ((Wall)bodyB.getUserData()).curr_wall_position);
+                }
+
 
                 if((bodyA == player_body && bodyB == floor_body) || (bodyB == player_body && bodyA == floor_body))
                 {
@@ -146,7 +151,7 @@ public class PlayScreen implements Screen, InputProcessor {
 
                 //print("jumping: "+ jumping +"\tOnGround: "+ onGround);
                 //print("\tx: "+ player_body.getPosition().x+"\ty: "+ player_body.getPosition().y);
-
+                print("\n");
             }
 
             @Override
