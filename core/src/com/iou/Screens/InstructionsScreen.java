@@ -22,6 +22,8 @@ public class InstructionsScreen implements Screen {
     final IOU game;
     private final Viewport viewport;
     private Stage stage;
+    Label greetings;
+    Label intro;
     Label returnMain;
     Label next;
     Label jumpControls;
@@ -74,7 +76,13 @@ public class InstructionsScreen implements Screen {
             }
         });
 
-        //intro = new Label("Hello and welcome to IOU.\n The goal of the game is to collect projects");
+        greetings = new Label("Hello and welcome to IOU.", new Label.LabelStyle(font, Color.BLACK));
+        greetings.setPosition(IOU.WIDTH/2-150,IOU.HEIGHT/2+ 250);
+
+        intro = new Label("The goal of the game is experience the college lifestyle of debt and schoolwork\n" +
+                "In order to succeed you must finish the projects thrown at you as best you can.\n When enough projects are complete then the gpa is calculated " +
+                "and any eligible \nscholarships will be awarded to the player's debt.", new Label.LabelStyle(font, Color.BLACK));
+        intro.setPosition(IOU.WIDTH/10,IOU.HEIGHT/2+100);
 
         jumpControls = new Label("Press  space bar to jump.", new Label.LabelStyle(font, Color.BLACK));
         jumpControls.setPosition(IOU.WIDTH/3,IOU.HEIGHT/2);
@@ -86,7 +94,8 @@ public class InstructionsScreen implements Screen {
         collectProjects.setPosition(IOU.WIDTH/3,IOU.HEIGHT/2-150);
 
 
-
+        stage.addActor(greetings);
+        stage.addActor(intro);
         stage.addActor(attackControls);
         stage.addActor(jumpControls);
         stage.addActor(returnMain);

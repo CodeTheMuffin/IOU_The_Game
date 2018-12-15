@@ -29,6 +29,7 @@ public class PlayScreen implements Screen, InputProcessor {
     public final IOU game;
     private Stage stage;
     private final Viewport viewport;
+    PausePopUp pauseMenu;
     World main_world;
     //Body player_body;
     static Player player;
@@ -177,6 +178,7 @@ public class PlayScreen implements Screen, InputProcessor {
         print("the keycode: "+ keycode);
         if(keycode == Input.Keys.ESCAPE)
         {
+            pauseMenu = new PausePopUp(stage,game);
             pause();
         }
 
