@@ -17,43 +17,36 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.iou.IOU;
 
-
-public class InstructionsScreen implements Screen {
+public class GameOverScreen implements Screen {
     final IOU game;
     private final Viewport viewport;
+    private double finalDebt;
     private Stage stage;
+    Label gameOver;
+    Label finalScore;
     Label returnMain;
-    Label next;
-    Label jumpControls;
-    Label attackControls;
-    Label collectProjects;
+    Label quit;
     private Texture background;
 
-    public InstructionsScreen(IOU game){
+    public GameOverScreen(IOU game){
         this.game = game;
         viewport = new FitViewport(IOU.WIDTH, IOU.HEIGHT, new OrthographicCamera());
-        stage = new Stage(viewport, game.batch);
+        stage= new Stage(viewport, game.batch);
         Gdx.input.setInputProcessor(stage);
     }
 
     @Override
     public void show() {
-        background = new Texture("badlogic.jpg");
-
-
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal
                 ("fonts/Letters_for_Learners/Letters for Learners.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 30;
         final BitmapFont font = generator.generateFont(parameter);
-        //generator.dispose();
-
-
 
         returnMain = new Label("Return to Main Menu", new Label.LabelStyle(font, Color.BLACK));
-        returnMain.setPosition(IOU.WIDTH/10,50);
+        returnMain.setPosition(IOU.WIDTH/2-100,IOU.HEIGHT/2);
         returnMain.setTouchable(Touchable.enabled);
-        returnMain.setBounds(IOU.WIDTH/10,50,returnMain.getWidth(),returnMain.getHeight());
+        returnMain.setBounds(IOU.WIDTH/2-100,IOU.HEIGHT/2,returnMain.getWidth(),returnMain.getHeight());
         returnMain.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
@@ -62,36 +55,28 @@ public class InstructionsScreen implements Screen {
             }
         });
 
-        next = new Label("Next", new Label.LabelStyle(font, Color.BLACK));
-        next.setPosition(IOU.WIDTH-200, 50);
-        next.setTouchable((Touchable.enabled));
-        next.setBounds(IOU.WIDTH-200,50, next.getWidth(),next.getHeight());
-        next.addListener(new ClickListener(){
+        quit = new Label("Quit", new Label.LabelStyle(font, Color.BLACK));
+        quit.setPosition(IOU.WIDTH/2-25,IOU.HEIGHT/2-50);
+        quit.setTouchable(Touchable.enabled);
+        quit.setBounds(IOU.WIDTH/2-25,IOU.HEIGHT/2-50,quit.getWidth(),quit.getHeight());
+        quit.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
-                game.setScreen(new NextInstructionsScreen(game));
-                dispose();
+                Gdx.app.exit();
             }
         });
 
-        //intro = new Label("Hello and welcome to IOU.\n The goal of the game is to collect projects");
+        gameOver = new Label("Game Over", new Label.LabelStyle(font,Color.BLACK));
+        gameOver.setPosition(IOU.WIDTH/2-50, IOU.HEIGHT/2+100);
 
-        jumpControls = new Label("Press  space bar to jump.", new Label.LabelStyle(font, Color.BLACK));
-        jumpControls.setPosition(IOU.WIDTH/3,IOU.HEIGHT/2);
+        finalScore = new Label("Final Debt amount is: $"+finalDebt, new Label.LabelStyle(font, Color.BLACK));
+        finalScore.setPosition(IOU.WIDTH/2-100, IOU.HEIGHT/2+50);
 
-        attackControls = new Label("Press E or Enter to throw pencils to\n increase project grade.", new Label.LabelStyle(font, Color.BLACK));
-        attackControls.setPosition(IOU.WIDTH/3,IOU.HEIGHT/2-75);
-
-        collectProjects = new Label("Collect the projects by touching them with the\n player", new Label.LabelStyle(font, Color.BLACK));
-        collectProjects.setPosition(IOU.WIDTH/3,IOU.HEIGHT/2-150);
-
-
-
-        stage.addActor(attackControls);
-        stage.addActor(jumpControls);
         stage.addActor(returnMain);
-        stage.addActor(collectProjects);
-        stage.addActor(next);
+        stage.addActor(quit);
+        stage.addActor(gameOver);
+        stage.addActor(finalScore);
+
     }
 
     @Override
@@ -104,6 +89,7 @@ public class InstructionsScreen implements Screen {
         // game.batch.draw(background,game.WIDTH,game.HEIGHT);
         game.batch.end();
         stage.draw();
+
     }
 
     @Override
@@ -128,8 +114,6 @@ public class InstructionsScreen implements Screen {
 
     @Override
     public void dispose() {
-        returnMain.setTouchable(Touchable.disabled);
-        next.setTouchable(Touchable.disabled);
+
     }
 }
-

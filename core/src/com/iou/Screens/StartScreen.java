@@ -26,6 +26,7 @@ public class StartScreen implements Screen {
     public final IOU game;
     private Viewport viewport;
     private Stage stage;
+    Label title;
     Label lbl_example;
     Label startLabel;
     Label instructionsLabel;
@@ -80,11 +81,14 @@ public class StartScreen implements Screen {
 
         final BitmapFont font = generator.generateFont(parameter);
 
+        title = new Label("IOU", new Label.LabelStyle(font,Color.BLACK));
+        title.setPosition(IOU.WIDTH/2-50, IOU.HEIGHT/2+50);
+
 
         startLabel = new Label("Start Game", new Label.LabelStyle(font, Color.BLACK));
-        startLabel.setPosition(325,300);
+        startLabel.setPosition(IOU.WIDTH/2-70,IOU.HEIGHT/2);
         startLabel.setTouchable(Touchable.enabled);
-        startLabel.setBounds(325,300,startLabel.getWidth(),startLabel.getHeight());
+        startLabel.setBounds(IOU.WIDTH/2-70,IOU.HEIGHT/2,startLabel.getWidth(),startLabel.getHeight());
         startLabel.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event,float x, float y ){
@@ -94,9 +98,9 @@ public class StartScreen implements Screen {
         });
 
         instructionsLabel = new Label("Instructions", new Label.LabelStyle(font, Color.BLACK));
-        instructionsLabel.setPosition(315,250);
+        instructionsLabel.setPosition(IOU.WIDTH/2-75,IOU.HEIGHT/2-50);
         instructionsLabel.setTouchable(Touchable.enabled);
-        instructionsLabel.setBounds(315 ,250, instructionsLabel.getWidth(),instructionsLabel.getHeight());
+        instructionsLabel.setBounds(IOU.WIDTH/2-75 ,IOU.HEIGHT/2-50, instructionsLabel.getWidth(),instructionsLabel.getHeight());
         instructionsLabel.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
@@ -106,16 +110,19 @@ public class StartScreen implements Screen {
         });
 
         quitLabel = new Label("Quit", new Label.LabelStyle(font, Color.BLACK));
-        quitLabel.setPosition(383,200);
+        quitLabel.setPosition(IOU.WIDTH/2-50,IOU.HEIGHT/2-100);
         quitLabel.setTouchable(Touchable.enabled);
-        quitLabel.setBounds(383,200,quitLabel.getWidth(),quitLabel.getHeight());
+        quitLabel.setBounds(IOU.WIDTH/2-50,IOU.HEIGHT/2-100,quitLabel.getWidth(),quitLabel.getHeight());
         quitLabel.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
-                Gdx.app.exit();
+                //testing the gameOver screen
+                game.setScreen(new GameOverScreen(game));
+                //Gdx.app.exit();
             }
         });
 
+        stage.addActor(title);
         stage.addActor(startLabel);
         stage.addActor(instructionsLabel);
         stage.addActor(quitLabel);
