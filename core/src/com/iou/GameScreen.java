@@ -431,25 +431,6 @@ public class GameScreen extends ApplicationAdapter implements InputProcessor {
             }
             //print("===============================");
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 
 

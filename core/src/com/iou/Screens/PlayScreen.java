@@ -7,8 +7,11 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -23,12 +26,13 @@ import com.iou.Pencil;
 import com.iou.Player;
 import com.iou.Wall;
 
+import static com.iou.IOU.PIXELS_PER_METER;
 import static com.iou.IOU.print;
 
 public class PlayScreen implements Screen, InputProcessor {
     public final IOU game;
     private Stage stage;
-    private final Viewport viewport;
+    public final Viewport play_viewport;
     PausePopUp pauseMenu;
     World main_world;
     //Body player_body;
@@ -37,20 +41,44 @@ public class PlayScreen implements Screen, InputProcessor {
     Wall floor, left_wall, right_wall, ceiling;
     public boolean isPaused = false;
 
+    //BOX2D DEBUGGING
+    public final static boolean DEBUG_MODE = true;
+    private Box2DDebugRenderer box2DDR;
+    private Matrix4 debugMatrix;
+    private boolean hitCtrl = false; //if user is hitting CTRL (used for faster scrolling in debug mode)
+
     public PlayScreen( IOU the_game)
     {
         print("In the Playscreen");
         game= the_game;
         camera = new OrthographicCamera();
-        this.viewport = new FitViewport(IOU.WIDTH, IOU.HEIGHT, new OrthographicCamera());
-        stage = new Stage(viewport, game.batch);
+        //this.viewport = new FitViewport(IOU.WIDTH, IOU.HEIGHT, new OrthographicCamera());
+        this.play_viewport = new FitViewport(IOU.WIDTH, IOU.HEIGHT, camera);
+        stage = new Stage(play_viewport, game.batch);
         Gdx.input.setInputProcessor(stage);
+        //camera.position.set( -5f,0,0 );
+        camera.viewportWidth = play_viewport.getScreenWidth()/PIXELS_PER_METER;
+        camera.viewportHeight = play_viewport.getScreenHeight()/PIXELS_PER_METER;
+
+        camera.position.set( 0,IOU.HEIGHT/2/PIXELS_PER_METER,0 );//in meters
+        //camera.position(new Vector2( 0,0 ));
 
         // create a world
         main_world = new World( new Vector2( 0, -20f ), true );
 
         if(player == null)
             player = new Player(main_world, game.batch);
+
+
+        debugMatrix=new Matrix4(camera.combined);
+
+        //BoxObjectManager.BOX_TO_WORLD = 100f
+        //Scale it by 100 as our box physics bodies are scaled down by 100
+        //debugMatrix.scale(PIXELS_PER_METER, PIXELS_PER_METER, 1f);
+        //NOT THIS//debugMatrix.scale(1,1,1f);
+
+        //DEBUGGING
+        this.box2DDR = new Box2DDebugRenderer();
 
         //Gdx.input.setInputProcessor( player );
         Gdx.input.setInputProcessor( this ); // Required for implementing 'InputProcessor'
@@ -71,18 +99,35 @@ public class PlayScreen implements Screen, InputProcessor {
         //Gdx.gl.glClearColor(.5f,.5f,.5f,0.1f);//black
         Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT);
 
+        //TODO: DELETE LATER
+        //camera.position.set( player.getBody_X(), player.getBody_Y(),0 );//this follows the player
+
         camera.update();
 
         //recommended default values (1/60, 6,2)
         if (!isPaused)//if NOT paused, then simulate physics (via run step/frame)
             main_world.step(1f/60f, 6, 2);
 
+        //draws things in the same way as debug and self scales
+        //game.batch.setProjectionMatrix( camera.combined );
+
+        if(DEBUG_MODE)
+        {
+            player.check_out_of_bounds();
+            //player.print_position();
+            //DEBUGGING
+            box2DDR.render( main_world, camera.combined );
+            //box2DDR.render( main_world, debugMatrix );
+        }
+
+        //include player control movements
+        player.movement();
+
         stage.draw();
         game.batch.begin();
-
             floor.draw_me(game.batch);
-            ceiling.draw_me(game.batch);
             left_wall.draw_me(game.batch);
+            ceiling.draw_me(game.batch);
             right_wall.draw_me(game.batch);
 
             player.draw_me(game.batch);
@@ -133,12 +178,16 @@ public class PlayScreen implements Screen, InputProcessor {
                 Body player_body = player.getBody();
                 Body floor_body = floor.getBody();
 
-                print("is bodyA the player or ground?: "+ (bodyA==player_body)+"\t"+ (bodyA== floor_body));
-                print("is bodyB the player or ground?: "+ (bodyB==player_body)+"\t"+ (bodyB== floor_body));
+                //print("is bodyA the player or ground?: "+ (bodyA==player_body)+"\t"+ (bodyA== floor_body));
+                //print("is bodyB the player or ground?: "+ (bodyB==player_body)+"\t"+ (bodyB== floor_body));
 
                 if(bodyB.getUserData().getClass() == Wall.class)
                 {
                     print("\tIt's a: "+ ((Wall)bodyB.getUserData()).curr_wall_position);
+                }
+                else
+                {
+                    print("\tIt's a: "+ bodyB.getUserData().getClass());
                 }
 
 
@@ -170,6 +219,8 @@ public class PlayScreen implements Screen, InputProcessor {
                 {
                     player.jumping= true;
                 }
+
+                //print("Collision ended");
             }
 
             @Override
@@ -191,10 +242,56 @@ public class PlayScreen implements Screen, InputProcessor {
     @Override
     public boolean keyDown(int keycode) {
 
-        print("the keycode: "+ keycode);
+        if(DEBUG_MODE)
+        {
+            float cam_speed = 0.1f;
+
+            switch (keycode){
+                case Input.Keys.NUMPAD_8:{
+                    camera.position.y += cam_speed;
+                    break;
+                }
+                case Input.Keys.NUMPAD_2:{
+                    camera.position.y -= cam_speed;
+                    break;
+                }
+                case Input.Keys.NUMPAD_4:{
+                    camera.position.x -= cam_speed;
+                    break;
+                }
+                case Input.Keys.NUMPAD_6:{
+                    camera.position.x += cam_speed;
+                    break;
+                }
+                case Input.Keys.NUMPAD_5:{//reset camera's original position
+                    camera.position.set( 0,IOU.HEIGHT/2/PIXELS_PER_METER,0 );//in meters
+                    break;
+                }
+                case Input.Keys.NUMPAD_9:{//position at player's body's origin
+                    camera.position.set( player.getBody_X(),player.getBody_Y(),0 );//in meters
+                    break;
+                }
+                case Input.Keys.CONTROL_LEFT:{
+                    hitCtrl = true;
+                    break;
+                }
+                case Input.Keys.CONTROL_RIGHT:{
+                    camera.viewportWidth = 1300;
+                    camera.viewportHeight = 1300;
+                    break;
+                }
+
+            }
+
+
+        }
+
+
+
+        //("the keycode: "+ keycode);
         if(keycode == Input.Keys.ESCAPE)
         {
-            print("Pressing ESC");
+            //print("Pressing ESC");
             //pauseMenu = new PausePopUp(stage,game, this);
             pause();
         }
@@ -222,6 +319,16 @@ public class PlayScreen implements Screen, InputProcessor {
     {
         //player.keyDown( keycode );//needed for player's input
         player.keyUp( keycode, isPaused );
+
+        if(DEBUG_MODE)
+        {
+            if(keycode == Input.Keys.CONTROL_LEFT)
+            {
+                hitCtrl = false;
+            }
+        }
+
+
         return true;
     }
 
@@ -254,11 +361,33 @@ public class PlayScreen implements Screen, InputProcessor {
 
     @Override
     public boolean scrolled(int amount) {
+        // to be used with debug renderer
+        if(DEBUG_MODE)
+        {
+            if(hitCtrl)
+                amount*=10;
+
+            camera.viewportWidth += amount;
+            camera.viewportHeight += amount;
+
+            print("[Camera ViewPort & Position]");
+            print("\tWidth : " + camera.viewportWidth);
+            print("\tHeight: "+ camera.viewportHeight);
+            print("\tX: "+ camera.position.x + "\tY: "+ camera.position.y);
+            print("==============");
+
+        }
+
         return false;
     }
 
     @Override
-    public void resize(int width, int height){}
+    public void resize(int width, int height)
+    {
+        print("Am i being called?");
+        //camera.viewportWidth = width/ PIXELS_PER_METER;
+        //camera.viewportHeight = height/PIXELS_PER_METER;
+    }
 
     //pauses when the user presses 'ESC' OR when the user clicks outside of the window.
     @Override

@@ -1,8 +1,14 @@
 package com.iou.Screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -11,6 +17,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.iou.IOU;
+
+import java.awt.event.KeyListener;
+
+import static com.badlogic.gdx.scenes.scene2d.InputEvent.Type.keyDown;
+import static com.iou.IOU.print;
 
 
 public class PausePopUp {
@@ -44,6 +55,20 @@ public class PausePopUp {
         pauseDialog.button(resume);
         pauseDialog.button(mainMenu);
         pauseDialog.show(stage);
+       //spauseDialog.setOrigin( 0,0 );
+        //pauseDialog.screenToLocalCoordinates( new Vector2( 0,0 ) );
+        //print("Pause Scale X: "+ pauseDialog.getScaleX() +"\tScale y: "+ pauseDialog.getScaleY());
+        //print("Pause X: "+ pauseDialog.getX() +"\t Y: "+ pauseDialog.getY());
+        //print("Pause o_X: "+ pauseDialog.getOriginX() +"\t o_Y: "+ pauseDialog.getOriginY());
+        //pauseDialog.setSize( 100,100 );
+        //pauseDialog.setOrigin( the_playScreen.camera.position.x,
+          //      the_playScreen.camera.position.y);
+        //auseDialog.setKeepWithinStage( true );
+        //stage.setViewport( the_playScreen.play_viewport);
+        //stage.getCamera().unproject( new Vector3( 0,0,0 ) );
+        //stage.setViewport( the_playScreen.play_viewport );
+        //stage.setViewport( new FitViewport(IOU.WIDTH, IOU.HEIGHT, the_playScreen.camera) );
+        //stage.setViewport( new FitViewport(IOU.WIDTH, IOU.HEIGHT, stage.getCamera()) );
 
         resume.addListener(new ClickListener(){
             @Override
@@ -62,7 +87,7 @@ public class PausePopUp {
             }
         });
 
-        mainMenu.addListener(new ClickListener(){
+        pauseDialog.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
                 pauseDialog.remove();//to get rid of the dialog box
@@ -70,8 +95,23 @@ public class PausePopUp {
                 game.setScreen( IOU.get_StartScreen( game ) );
             }
         });
+
+
         Gdx.input.setInputProcessor(stage);
 
+        //TODO: This doesn't close the dialog box
+        stage.addListener( new InputListener(){
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if(keycode == Input.Keys.ESCAPE)
+                {
+                    print("\tPressing ESCAPE! LET ME GO!");
+                    RemoveDialog();
+                }
+
+                return true;
+            }
+        });
 
     }
 
@@ -84,5 +124,7 @@ public class PausePopUp {
 
         //typically you would refocus the stage, but that didn't work, but this did.
         Gdx.input.setInputProcessor(the_playScreen);//sets the input focused back on the screen
+        the_playScreen.isPaused = false;//TODO: a temporary fix
+        //BUG: issues were it will not properly close the popup, so when ESC is pressed again it would not pause!
     }
 }
