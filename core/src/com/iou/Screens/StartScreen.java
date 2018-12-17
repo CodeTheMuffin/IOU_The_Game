@@ -35,6 +35,7 @@ public class StartScreen implements Screen {
     OrthographicCamera camera;
 
 
+
     public StartScreen(IOU the_game)
     {
         game= the_game;
@@ -43,8 +44,9 @@ public class StartScreen implements Screen {
         viewport = new FitViewport( IOU.WIDTH, IOU.HEIGHT, camera );
         stage = new Stage(viewport, game.batch);
         Gdx.input.setInputProcessor( stage );
-        img_delte_me = new Sprite(new Texture( Gdx.files.internal( "badlogic.jpg" ) ));
-        img_delte_me.setPosition( 50,30 );
+        img_delte_me = new Sprite(new Texture( Gdx.files.internal( "school-background.jpg" ) ));
+        img_delte_me.setPosition( IOU.WIDTH-IOU.WIDTH,0 );
+        img_delte_me.setSize(IOU.WIDTH,IOU.HEIGHT);
     }
 
     @Override
@@ -55,13 +57,14 @@ public class StartScreen implements Screen {
         //Gdx.gl.glClearColor(.5f,.5f,.5f,0.1f);//black
         Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT);
 
-        stage.draw();
+
         game.batch.begin();
         //game.batch.draw(imgNinja,10,10,300,470);
-        //img_delte_me.draw( game.batch );
+        img_delte_me.draw( game.batch );
 
         //gam
         game.batch.end();
+        stage.draw();
     }
 
     public static void print( String s )
@@ -91,12 +94,12 @@ public class StartScreen implements Screen {
             final BitmapFont font = generator.generateFont( parameter );
 
             title = new Label( "IOU", new Label.LabelStyle( font, Color.BLACK ) );
-            title.setPosition( IOU.WIDTH / 2 - 50, IOU.HEIGHT / 2 + 50 );
+            title.setPosition( IOU.WIDTH / 2 - 25, IOU.HEIGHT / 2 + 50 );
 
             startLabel = new Label( startText, new Label.LabelStyle( font, Color.BLACK ) );
-            startLabel.setPosition( IOU.WIDTH / 2 - 80, IOU.HEIGHT / 2 );// was 70
+            startLabel.setPosition( IOU.WIDTH / 2 - 65, IOU.HEIGHT / 2 );// was 70
             startLabel.setTouchable( Touchable.enabled );
-            startLabel.setBounds( IOU.WIDTH / 2 - 80, IOU.HEIGHT / 2, startLabel.getWidth(), startLabel.getHeight() );
+            startLabel.setBounds( IOU.WIDTH / 2 - 65, IOU.HEIGHT / 2, startLabel.getWidth(), startLabel.getHeight() );
             startLabel.addListener( new ClickListener() {
                 @Override
                 public void clicked( InputEvent event, float x, float y )
@@ -108,9 +111,9 @@ public class StartScreen implements Screen {
             } );
 
             instructionsLabel = new Label( "Instructions", new Label.LabelStyle( font, Color.BLACK ) );
-            instructionsLabel.setPosition( IOU.WIDTH / 2 - 75, IOU.HEIGHT / 2 - 50 );
+            instructionsLabel.setPosition( IOU.WIDTH / 2 - 55, IOU.HEIGHT / 2 - 50 );
             instructionsLabel.setTouchable( Touchable.enabled );
-            instructionsLabel.setBounds( IOU.WIDTH / 2 - 75, IOU.HEIGHT / 2 - 50, instructionsLabel.getWidth(), instructionsLabel.getHeight() );
+            instructionsLabel.setBounds( IOU.WIDTH / 2 - 55, IOU.HEIGHT / 2 - 50, instructionsLabel.getWidth(), instructionsLabel.getHeight() );
             instructionsLabel.addListener( new ClickListener() {
                 @Override
                 public void clicked( InputEvent event, float x, float y )
@@ -121,9 +124,9 @@ public class StartScreen implements Screen {
             } );
 
             quitLabel = new Label( "Quit", new Label.LabelStyle( font, Color.BLACK ) );
-            quitLabel.setPosition( IOU.WIDTH / 2 - 50, IOU.HEIGHT / 2 - 100 );
+            quitLabel.setPosition( IOU.WIDTH / 2 - 25, IOU.HEIGHT / 2 - 100 );
             quitLabel.setTouchable( Touchable.enabled );
-            quitLabel.setBounds( IOU.WIDTH / 2 - 50, IOU.HEIGHT / 2 - 100, quitLabel.getWidth(), quitLabel.getHeight() );
+            quitLabel.setBounds( IOU.WIDTH / 2 - 25, IOU.HEIGHT / 2 - 100, quitLabel.getWidth(), quitLabel.getHeight() );
             quitLabel.addListener( new ClickListener() {
                 @Override
                 public void clicked( InputEvent event, float x, float y )

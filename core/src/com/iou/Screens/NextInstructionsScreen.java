@@ -44,7 +44,7 @@ public class NextInstructionsScreen implements Screen {
 
         final BitmapFont font = generator.generateFont(parameter);
 
-        caffeineMechanic = new Label("The coffee meter shows how much coffee the player has left."+
+        caffeineMechanic = new Label("The caffeine meter shows how much caffeine the player has left."+
                 " To increase the\ncaffeine level you need to collect the coffee cups flying towards you." +
                 " Once at \nmax caffeine level the player will have increase throwing and movement speed.", new Label.LabelStyle(font, Color.BLACK));
         caffeineMechanic.setPosition(IOU.WIDTH/8,300);

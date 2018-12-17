@@ -15,12 +15,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.iou.HUD.HUD;
 import com.iou.IOU;
 
 public class GameOverScreen implements Screen {
     final IOU game;
     private final Viewport viewport;
-    private double finalDebt;
+    private double finalDebt = HUD.getDebtOwed();
     private Stage stage;
     Label gameOver;
     Label finalScore;
