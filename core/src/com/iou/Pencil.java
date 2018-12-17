@@ -14,7 +14,6 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import static com.iou.IOU.PIXELS_PER_METER;
 import static com.iou.IOU.print;
 
-
 public class Pencil {
     Body bullet_body;
     Sprite bullet_sprite;
@@ -25,7 +24,9 @@ public class Pencil {
     final float bullet_width_px = 20f, bullet_height_px = 10f; //in pixels
     final float bullet_world_width = bullet_width_px/PIXELS_PER_METER;//in meters
     final float bullet_world_height = bullet_height_px/PIXELS_PER_METER;//in meters
+    private Timer pencil_timer;
 
+    private boolean isReadyToDie = false;
     //stuff for setting up stuff
 
     public Pencil(Player the_player)//public Pencil( Batch the_batch, Player the_player)
@@ -99,7 +100,6 @@ public class Pencil {
         //TODO: THIS WAS USED
         //bullet_body.applyLinearImpulse( 10*PIXELS_PER_METER,0,0,0,false );
 
-
         //testing
         //bullet_body.applyForceToCenter( 0.1f,0.0f, true );//0.3
         //bullet_body.setLinearVelocity( .1f,0f);
@@ -108,6 +108,8 @@ public class Pencil {
         bullet_body.setUserData( this );
         //bullet_bodies.add(new Bullet( bullet_body, b_sprite ));
         shape.dispose();
+
+        pencil_timer = new Timer(1f);
     }
 
     public Body get_pencil_body()
@@ -121,23 +123,67 @@ public class Pencil {
     {
         //bullet_body.applyLinearImpulse( 50*PIXELS_PER_METER,0,0,0,true );
         //bullet_sprite.setPosition( bullet_body.getPosition().x, bullet_body.getPosition().y );
-        bullet_sprite.setPosition( getX() - (bullet_world_width/2),
-                getY() - (bullet_world_height/2));
+        if(!isReadyToDie)
+        {
+            bullet_sprite.setPosition( getBodyX() - (bullet_world_width/2),
+                    getBodyY() - (bullet_world_height/2));
 
-        bullet_sprite.setRotation( bullet_body.getAngle() * MathUtils.radiansToDegrees );
-        bullet_sprite.draw( batch );
+            bullet_sprite.setRotation( bullet_body.getAngle() * MathUtils.radiansToDegrees );
+            bullet_sprite.draw( batch );
+
+            check_out_of_bounds();
+
+            if(pencil_timer.isTimeUp() )
+            {
+                destroy();
+            }
+        }
+        else
+        {
+            bullet_sprite = null;// to be thrown away
+        }
+
     }
 
-    public float getX()
+    //just in case something goes bonkers...
+    //Pencil and Assignment have same method
+    public void check_out_of_bounds()
+    {
+        float body_x = getBodyX();
+        float body_y = getBodyY();
+
+        float max_y = (IOU.HEIGHT+(Wall.extra_space))/PIXELS_PER_METER;
+        float min_y = -max_y;
+        float max_x = (IOU.WIDTH+(Wall.extra_space))/PIXELS_PER_METER;
+        float min_x = -max_x;
+
+        //if(body_y <0 || body_y > IOU.HEIGHT || body_x<0 || body_x >IOU.WIDTH/2/PIXELS_PER_METER)
+        if(body_y < min_y || body_y >max_y || body_x < min_x || body_x > max_x)
+        {
+            destroy();
+        }
+    }
+
+    //in meters
+    public float getBodyX()
     {
         return bullet_body.getPosition().x;
     }
-
-    public float getY()
+    public float getBodyY()
     {
         return bullet_body.getPosition().y;
     }
 
     public Body getBody()
     {return bullet_body;}
+
+    public void destroy()
+    {
+        isReadyToDie = true;
+        player.getWorld().destroyBody( bullet_body );
+    }
+
+    //asks if is is ready to die
+    public boolean isTimerDone()
+    {return isReadyToDie;}//pencil_timer.isTimeUp();}
 }

@@ -25,7 +25,6 @@ public class IOU extends Game{
     public static AssetManager assetManager;
 
     public void create () {
-
         batch = new SpriteBatch();
         assetManager = new AssetManager();
         //assetManager.load("audio/music/pirateMusic.mp3", Music.class);
@@ -34,7 +33,6 @@ public class IOU extends Game{
         set_StartScreen( new StartScreen(this) );
 
         this.setScreen(main_startScreen);
-
     }
 
     public static final void print( String s )

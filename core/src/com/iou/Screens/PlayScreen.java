@@ -21,11 +21,16 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.iou.HUD.HUD;
+import com.iou.Assignments;
 import com.iou.IOU;
 import com.iou.Pencil;
 import com.iou.Player;
 import com.iou.Wall;
+import com.iou.HUD.HUD;
+
+import java.util.ArrayList;
+
+import jdk.nashorn.internal.ir.Assignment;
 
 import static com.iou.IOU.PIXELS_PER_METER;
 import static com.iou.IOU.print;
@@ -41,8 +46,7 @@ public class PlayScreen implements Screen, InputProcessor {
     OrthographicCamera camera;
     Wall floor, left_wall, right_wall, ceiling;
     public boolean isPaused = false;
-
-    private HUD hud;
+    public static float global_timer = 10*60;//representing 10 minutes in seconds
 
     //BOX2D DEBUGGING
     public final static boolean DEBUG_MODE = true;
@@ -50,9 +54,12 @@ public class PlayScreen implements Screen, InputProcessor {
     private Matrix4 debugMatrix;
     private boolean hitCtrl = false; //if user is hitting CTRL (used for faster scrolling in debug mode)
 
+	private HUD hud;
+	
+    public Assignments debugAssignment;//TODO: to delete later;
+
     public PlayScreen( IOU the_game)
     {
-        print("In the Playscreen");
         game= the_game;
         camera = new OrthographicCamera();
         //this.viewport = new FitViewport(IOU.WIDTH, IOU.HEIGHT, new OrthographicCamera());
@@ -66,9 +73,9 @@ public class PlayScreen implements Screen, InputProcessor {
         camera.position.set( 0,IOU.HEIGHT/2/PIXELS_PER_METER,0 );//in meters
         //camera.position(new Vector2( 0,0 ));
 
-        //creating the hud
-        hud = new HUD(game.batch, this);
-
+		//creating the hud
+		hud = new HUD(game.batch, this);
+		
         // create a world
         main_world = new World( new Vector2( 0, -20f ), true );
 
@@ -93,6 +100,8 @@ public class PlayScreen implements Screen, InputProcessor {
         right_wall  = new Wall(player, Wall.wall_position.RIGHT);
         ceiling     = new Wall(player, Wall.wall_position.UP);
 
+        debugAssignment  = new Assignments( main_world );
+
         //print("screen width: "+ Gdx.graphics.getWidth()+"\theight: "+ Gdx.graphics.getHeight());
         CreateContactListener();
         IOU.set_PlayScreen( this );
@@ -111,12 +120,14 @@ public class PlayScreen implements Screen, InputProcessor {
         camera.update();
 
         //recommended default values (1/60, 6,2)
-        if (!isPaused) {//if NOT paused, then simulate physics (via run step/frame)
-            main_world.step(1f / 60f, 6, 2);
-            //updating the debt owed by the player
+        if (!isPaused)//if NOT paused, then simulate physics (via run step/frame)
+		{
+			main_world.step(1f/60f, 6, 2);
+			//updating the debt owed by the player
             hud.setDebtOwed(HUD.getDebtOwed()+1);
             hud.updateDebtOwed(HUD.getDebtOwed());
-        }
+		}
+
         //draws things in the same way as debug and self scales
         //game.batch.setProjectionMatrix( camera.combined );
 
@@ -132,27 +143,52 @@ public class PlayScreen implements Screen, InputProcessor {
         //include player control movements
         player.movement();
 
-
         stage.draw();
         game.batch.begin();
-            floor.draw_me(game.batch);
-            left_wall.draw_me(game.batch);
-            ceiling.draw_me(game.batch);
-            right_wall.draw_me(game.batch);
+            //floor.draw_me(game.batch);
+            //left_wall.draw_me(game.batch);
+            //ceiling.draw_me(game.batch);
+            //right_wall.draw_me(game.batch);
 
             player.draw_me(game.batch);
             //player.getSprite().draw( game.batch );
 
-            for(Pencil pencil: player.Player_Pencils)
+            if(debugAssignment != null)
             {
-                pencil.draw_me(game.batch);
-                //pencil.get_Pencil_sprite().draw( game.batch );
+                if(!debugAssignment.isTimerDone())
+                    debugAssignment.draw_me( game.batch );
+                else
+                    debugAssignment = null;
             }
+
+
+            player.draw_pencils( game.batch );
+            /*
+            //draw valid pencils, remove unnecessary ones
+            for(int i= 0;i<player.Player_Pencils.size(); i++)//for(Pencil pencil: player.Player_Pencils)
+            {
+                Pencil pencil = player.Player_Pencils.get( i );
+
+                if(!pencil.isTimerDone())
+                    pencil.draw_me(game.batch);
+                else
+                {
+                    player.Player_Pencils.remove( i );
+                    i--;
+                    //player.Player_Pencils.remove( pencil );
+                }
+                //pencil.get_Pencil_sprite().draw( game.batch );
+            }*/
+
+
         game.batch.end();
 
-        game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
 
-        hud.stage.draw();
+
+		game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
+
+		hud.stage.draw();
+
     }
 
     /*
@@ -183,6 +219,54 @@ public class PlayScreen implements Screen, InputProcessor {
                 Body bodyA = fixtureA.getBody();//.getUserData();
                 Body bodyB = fixtureB.getBody();//.getUserData();
 
+                Object objA = bodyA.getUserData();
+                Object objB = bodyB.getUserData();
+
+                ArrayList<Wall> contactWall = new ArrayList<Wall>();
+                ArrayList<Assignments> contactAssignment = new ArrayList<Assignments>();
+                ArrayList<Pencil> contactPencil = new ArrayList<Pencil>();
+
+                //ONLY CARE ABOUT WHEN:
+                /*
+                * Player and Assignment Hit:
+                *   - Collect Assignment AS IS, apply grade, and get rid of assignment.
+                *
+                *  Assignment and Wall:
+                *   - if LEFT wall:
+                *       - Collect assignment, apply 'late' grade, and get rid of assignment
+                *
+                * Player and E-Drink:
+                *   - Apply boost, get rid of E-Drink
+                *
+                * */
+
+
+                boolean isPencil =false, isWall = false, isPlayer = false, isAssignment = false;
+                //for wall, only care about the left wall with assignments
+
+                print("objA: "+ objA.getClass()+"\tobjB: "+ objB.getClass());
+                if(objA instanceof  Pencil)//if(objA instanceof Pencil || objB instanceof Pencil)
+                {
+                    isPencil = true;
+                    contactPencil.add( (Pencil)objA );
+                }
+
+                if(objB instanceof  Pencil)
+                {
+                    isPencil = true;
+                    contactPencil.add( (Pencil)objB );
+                }
+
+                if(objA instanceof  Pencil)//if(objA instanceof Pencil || objB instanceof Pencil)
+                {
+                    isPencil = true;
+                    contactPencil.add( (Pencil)objA );
+                }
+
+                print( "\tWas it a pencil?: "+ isPencil );
+
+
+
                 /*
 				if(bodyA != null && bodyB != null)
 					print("\tObject A user data: "+ bodyA.toString()+"\tObject B user data: "+ bodyB.toString());
@@ -197,24 +281,24 @@ public class PlayScreen implements Screen, InputProcessor {
 
                 if(bodyB.getUserData().getClass() == Wall.class)
                 {
-                    print("\tIt's a: "+ ((Wall)bodyB.getUserData()).curr_wall_position);
+                    //print("\tIt's a: "+ ((Wall)bodyB.getUserData()).curr_wall_position);
                 }
                 else
                 {
-                    print("\tIt's a: "+ bodyB.getUserData().getClass());
+                    //print("\tIt's a: "+ bodyB.getUserData().getClass());
                 }
 
 
                 if((bodyA == player_body && bodyB == floor_body) || (bodyB == player_body && bodyA == floor_body))
                 {
-                    print("\t\tColliding with ground.");
+                    //print("\t\tColliding with ground.");
                     player.jumping= false;
                     player.onGround = true;
                 }
 
                 //print("jumping: "+ jumping +"\tOnGround: "+ onGround);
                 //print("\tx: "+ player_body.getPosition().x+"\ty: "+ player_body.getPosition().y);
-                print("\n");
+                //print("\n");
             }
 
             @Override
@@ -398,7 +482,6 @@ public class PlayScreen implements Screen, InputProcessor {
     @Override
     public void resize(int width, int height)
     {
-        print("Am i being called?");
         //camera.viewportWidth = width/ PIXELS_PER_METER;
         //camera.viewportHeight = height/PIXELS_PER_METER;
     }
@@ -415,7 +498,6 @@ public class PlayScreen implements Screen, InputProcessor {
         }
 
         pauseMenu = new PausePopUp(stage,game, this);
-
     }
 
     //resumes when the user click 'Resume' in dialog box OR when user clicks back inside the window

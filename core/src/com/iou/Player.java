@@ -37,7 +37,6 @@ public class Player {//implements InputProcessor {
     int left_center_right = 0;// -1 left    0 center   +1 right
 
     //FOR THE PENCILS being thrown
-    BodyDef bullet_bodyDef;
     public ArrayList< Pencil > Player_Pencils;
 
     public Player(World world, Batch the_batch)
@@ -59,7 +58,7 @@ public class Player {//implements InputProcessor {
     {
         player_sprite.setColor( Color.BLUE );
 
-        print("Are the world's the same?: "+ main_world + "\t"+getWorld());
+        //print("Are the world's the same?: "+ main_world + "\t"+getWorld());
 
         //create a body definition for the player
         //it needs to be dynamic, because we expect the player to be moving
@@ -125,6 +124,26 @@ public class Player {//implements InputProcessor {
 
         player_sprite.draw( batch );
         //print("player pos: "+ player_sprite.getWidth()+"\t" +player_sprite.getHeight()+"\n");
+    }
+
+    //draw pencils if they can
+    public void draw_pencils(Batch batch)
+    {
+        //draw valid pencils, remove unnecessary ones
+        for(int i= 0;i<Player_Pencils.size(); i++)//for(Pencil pencil: player.Player_Pencils)
+        {
+            Pencil pencil = Player_Pencils.get( i );
+
+            if(!pencil.isTimerDone())
+                pencil.draw_me(batch);
+            else
+            {
+                Player_Pencils.remove( i );
+                i--;
+                //player.Player_Pencils.remove( pencil );
+            }
+            //pencil.get_Pencil_sprite().draw( game.batch );
+        }
     }
 
     //to be called in the draw_me(). really only for rendering purposes
@@ -249,8 +268,6 @@ public class Player {//implements InputProcessor {
         {
             player_body.applyAngularImpulse( -1,true );
         }
-
-
 
         if(keycode == Input.Keys.SPACE && onGround)
         {

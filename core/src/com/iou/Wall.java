@@ -27,6 +27,7 @@ public class Wall {
     BodyDef wall_bodyDef;
     float wall_width=0, wall_height=0;//relative to the screen (in pixels)
     float wall_x = 0, wall_y =0;
+    public final static float extra_space = 80;//in pixels
 
     public Wall(Player the_player, wall_position the_position)
     {
@@ -52,20 +53,17 @@ public class Wall {
         {
             case UP://ceiling
             {
-                wall_width= IOU.WIDTH;
+                wall_width= IOU.WIDTH + extra_space*2;
                 wall_height = IOU.HEIGHT*.05f;//making height 5% of the max viewport height
-                //wall_x = (0- wall_height/2)/PIXELS_PER_METER;
                 wall_x=0;
-                //wall_y= (IOU.HEIGHT- wall_height)/PIXELS_PER_METER;
-                //wall_y= ((IOU.HEIGHT-wall_height)/2)/PIXELS_PER_METER;
-                wall_y= (0+ IOU.HEIGHT)/PIXELS_PER_METER;//+4f
-                //wall_y= (IOU.HEIGHT)/PIXELS_PER_METER;
+                //wall_y= (0+ IOU.HEIGHT)/PIXELS_PER_METER;//+4f
+                wall_y= (0+ IOU.HEIGHT+ wall_height+extra_space/2)/PIXELS_PER_METER;//+4f + half of the height
                 wall_sprite.setColor( Color.GREEN );//for debugging
                 break;
             }
             case DOWN://floor
             {
-                wall_width= IOU.WIDTH;
+                wall_width= IOU.WIDTH + extra_space*2;
                 wall_height = IOU.HEIGHT*.05f;//making height 5% of the max viewport height
                 //wall_x = (0 + wall_width/2)/PIXELS_PER_METER ;// keep 0 for better understanding
                 wall_x = 0;
@@ -78,38 +76,33 @@ public class Wall {
             }
             case LEFT://left wall
             {
-                wall_height= IOU.HEIGHT;//IOU.WIDTH;
-                wall_width = IOU.WIDTH*0.05f;//IOU.HEIGHT*.05f;//making height 5% of the max viewport height
-                //wall_x = (0- wall_width/2f)/PIXELS_PER_METER;
-                wall_x = (0-IOU.WIDTH/2)/PIXELS_PER_METER; //-5f
-                wall_y= (0+ IOU.HEIGHT/2)/PIXELS_PER_METER;//+4f just to show you the math
-                print("\t\t<X> "+ wall_x);
+                wall_height= IOU.HEIGHT + extra_space;
+                wall_width = IOU.WIDTH*0.05f;//making height 5% of the max viewport height
+
+                //wall_x = (0-IOU.WIDTH/2)/PIXELS_PER_METER; //-5f
+                wall_x = (0-(IOU.WIDTH/2) - extra_space)/PIXELS_PER_METER; //-5f
+                //wall_y= (0+ IOU.HEIGHT/2)/PIXELS_PER_METER;//+4f just to show you the math
+                wall_y= (0+ (IOU.HEIGHT+extra_space))/2/PIXELS_PER_METER;//+4f just to show you the math
                 wall_sprite.setColor( Color.RED );//for debugging
                 break;
             }
             case RIGHT://right wall
             {
-                wall_height= IOU.HEIGHT;//IOU.WIDTH;
+                wall_height= IOU.HEIGHT+ extra_space;//IOU.WIDTH;
                 wall_width = IOU.WIDTH*0.05f;//IOU.HEIGHT*.05f;//making height 5% of the max viewport height
-                //wall_x = IOU.WIDTH - IOU.HEIGHT*.05f;
-                //wall_x = (IOU.WIDTH - wall_width/2)/PIXELS_PER_METER;
-                //wall_x = (IOU.WIDTH/2/PIXELS_PER_METER);
-                //wall_x = wall_width/2/PIXELS_PER_METER;
-                //wall_x = (IOU.WIDTH - (wall_width))/PIXELS_PER_METER;
-                //wall_x = IOU.WIDTH*.095f/PIXELS_PER_METER;
-                //wall_x = (IOU.WIDTH -wall_width)/2/PIXELS_PER_METER;
-                wall_x = (0+IOU.WIDTH/2)/PIXELS_PER_METER; //+5f;
-                wall_y= (0+ IOU.HEIGHT/2)/PIXELS_PER_METER;//+4f;
+
+                //wall_x = (0+IOU.WIDTH/2)/PIXELS_PER_METER; //+5f;
+                wall_x = (0+(IOU.WIDTH/2)+extra_space)/PIXELS_PER_METER; //+5f;
+                wall_y= (0+ ((IOU.HEIGHT+extra_space)))/2/PIXELS_PER_METER;//+4f;
                 wall_sprite.setColor( Color.YELLOW );//for debugging
                 break;
             }
         }
-
-
         //wall_sprite.setSize( wall_width,wall_height );
 
-        //wall_bodyDef.position.set( wall_x,wall_y );//bottom left?
-        wall_bodyDef.position.set(  wall_x , Math.abs(wall_y) );
+        wall_bodyDef.position.set( wall_x,wall_y );
+        //wall_bodyDef.position.set(  wall_x , Math.abs(wall_y) );
+
 
         //wall_bodyDef.position.set( ( player.getSprite().getX() + player.getSprite().getWidth()+50  ) ,
            //     ( player.getSprite().getY() + player.getSprite().getHeight() / 2 ) );
@@ -198,6 +191,14 @@ public class Wall {
         }
 
     }
+
+    //in pixels
+    public float getWall_width(){return wall_width;}
+    public float getWall_height(){return wall_height;}
+
+    //in meters
+    public float getWall_X(){return wall_x;}
+    public float getWall_Y(){return wall_y;}
 
     public Body getBody()
     {return wall_body;}
