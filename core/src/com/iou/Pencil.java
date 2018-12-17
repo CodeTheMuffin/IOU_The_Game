@@ -132,7 +132,7 @@ public class Pencil {
 
             check_out_of_bounds();
 
-            if(pencil_timer.isTimeUp() )
+            if(pencil_timer.isTimeUp())
             {
                 destroy();
             }
@@ -140,7 +140,7 @@ public class Pencil {
         else
         {
             //just added
-            destroy();
+            //destroy();
 
             bullet_sprite = null;// to be thrown away
         }
@@ -193,7 +193,7 @@ public class Pencil {
         isReadyToDie = true;
         if(bullet_body != null)
         {
-            player.getWorld().destroyBody( bullet_body );
+            the_world.destroyBody( bullet_body );
         }
     }
 

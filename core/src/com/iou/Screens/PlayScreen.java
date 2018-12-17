@@ -347,7 +347,7 @@ public class PlayScreen implements Screen, InputProcessor {
                     else if(isPencil)//if objA or objB is a Pencil object
                     {
                         contactAssignment.get(0).pencil_hit();//increment assignment's grade, if allowed
-                        contactPencil.get(0).set_to_DIE();
+                        //contactPencil.get(0).set_to_DIE();
 
                         //contactPencil.get(0).destroy();//get rid of pencil
                     }

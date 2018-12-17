@@ -184,6 +184,7 @@ public class Player {//implements InputProcessor {
     //draw pencils if they can
     public void draw_pencils(Batch batch)
     {
+        print("drawing pencils: "+ Player_Pencils.size());
         //draw valid pencils, remove unnecessary ones
         for(int i= 0;i<Player_Pencils.size(); i++)//for(Pencil pencil: player.Player_Pencils)
         {
@@ -193,8 +194,6 @@ public class Player {//implements InputProcessor {
                 pencil.draw_me(batch);
             else//if timer is done or if ready to die
             {
-
-
                 /* This broke the program
                     if(pencil.get_pencil_body() != null)//if there is still a body, get rid of it in the world!
                     {
@@ -425,7 +424,6 @@ public class Player {//implements InputProcessor {
         //shape.dispose();
 
     }
-
 
 
     //"Called when a key was released"
