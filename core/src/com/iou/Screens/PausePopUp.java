@@ -21,6 +21,7 @@ import com.iou.IOU;
 import java.awt.event.KeyListener;
 
 import static com.badlogic.gdx.scenes.scene2d.InputEvent.Type.keyDown;
+import static com.iou.IOU.PIXELS_PER_METER;
 import static com.iou.IOU.print;
 
 
@@ -95,6 +96,7 @@ public class PausePopUp {
                 game.setScreen( IOU.get_StartScreen( game ) );
             }
         });
+
 
 
         Gdx.input.setInputProcessor(stage);

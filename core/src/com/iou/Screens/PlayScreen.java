@@ -21,6 +21,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.iou.HUD.HUD;
 import com.iou.IOU;
 import com.iou.Pencil;
 import com.iou.Player;
@@ -40,6 +41,8 @@ public class PlayScreen implements Screen, InputProcessor {
     OrthographicCamera camera;
     Wall floor, left_wall, right_wall, ceiling;
     public boolean isPaused = false;
+
+    private HUD hud;
 
     //BOX2D DEBUGGING
     public final static boolean DEBUG_MODE = true;
@@ -62,6 +65,9 @@ public class PlayScreen implements Screen, InputProcessor {
 
         camera.position.set( 0,IOU.HEIGHT/2/PIXELS_PER_METER,0 );//in meters
         //camera.position(new Vector2( 0,0 ));
+
+        //creating the hud
+        hud = new HUD(game.batch, this);
 
         // create a world
         main_world = new World( new Vector2( 0, -20f ), true );
@@ -105,9 +111,12 @@ public class PlayScreen implements Screen, InputProcessor {
         camera.update();
 
         //recommended default values (1/60, 6,2)
-        if (!isPaused)//if NOT paused, then simulate physics (via run step/frame)
-            main_world.step(1f/60f, 6, 2);
-
+        if (!isPaused) {//if NOT paused, then simulate physics (via run step/frame)
+            main_world.step(1f / 60f, 6, 2);
+            //updating the debt owed by the player
+            hud.setDebtOwed(HUD.getDebtOwed()+1);
+            hud.updateDebtOwed(HUD.getDebtOwed());
+        }
         //draws things in the same way as debug and self scales
         //game.batch.setProjectionMatrix( camera.combined );
 
@@ -122,6 +131,7 @@ public class PlayScreen implements Screen, InputProcessor {
 
         //include player control movements
         player.movement();
+
 
         stage.draw();
         game.batch.begin();
@@ -139,6 +149,10 @@ public class PlayScreen implements Screen, InputProcessor {
                 //pencil.get_Pencil_sprite().draw( game.batch );
             }
         game.batch.end();
+
+        game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
+
+        hud.stage.draw();
     }
 
     /*
@@ -401,6 +415,7 @@ public class PlayScreen implements Screen, InputProcessor {
         }
 
         pauseMenu = new PausePopUp(stage,game, this);
+
     }
 
     //resumes when the user click 'Resume' in dialog box OR when user clicks back inside the window
