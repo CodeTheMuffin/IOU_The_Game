@@ -132,9 +132,11 @@ public class Pencil {
 
             check_out_of_bounds();
 
+
             if(pencil_timer.isTimeUp())
             {
-                destroy();
+                isReadyToDie = true;
+                //destroy();
             }
         }
         else
@@ -162,7 +164,7 @@ public class Pencil {
         //if(body_y <0 || body_y > IOU.HEIGHT || body_x<0 || body_x >IOU.WIDTH/2/PIXELS_PER_METER)
         if(body_y < min_y || body_y >max_y || body_x < min_x || body_x > max_x)
         {
-            destroy();
+            isReadyToDie = true;//destroy();
         }
     }
 
@@ -179,6 +181,7 @@ public class Pencil {
     public Body getBody()
     {return bullet_body;}
 
+    /*
     public void destroy()
     {
         isReadyToDie = true;
@@ -196,7 +199,7 @@ public class Pencil {
             the_world.destroyBody( bullet_body );
         }
     }
-
+    */
     //should be called when the pencil hits something, ie, an assignment
     public void set_to_DIE()
     {isReadyToDie = true;}

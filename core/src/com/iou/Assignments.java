@@ -228,7 +228,7 @@ public class Assignments extends GAME_OBJECT{
 
             if(test_timer.isTimeUp() )
             {
-                destroy();//print("time is up");
+                isReadyToDie = true;//destroy();//print("time is up");
             }
         }
 
@@ -249,10 +249,22 @@ public class Assignments extends GAME_OBJECT{
         //if(body_y <0 || body_y > IOU.HEIGHT || body_x<0 || body_x >IOU.WIDTH/2/PIXELS_PER_METER)
         if(body_y < min_y || body_y >max_y || body_x < min_x || body_x > max_x)
         {
-            destroy();
+            isReadyToDie = true;
+            //destroy();
         }
     }
 
+    public int getGrade()
+    {
+        if(isBad)
+            return 0;
+        else if (isAwesome)
+            return MAX_GRADE;
+
+        return grade;
+    }
+
+    /*
     public void destroy()
     {
         isReadyToDie = true;
@@ -269,7 +281,7 @@ public class Assignments extends GAME_OBJECT{
         {
             the_world.destroyBody( assignment_body );
         }
-    }
+    }*/
 
     //called when a pencil hit the assignment
     public void pencil_hit()
@@ -293,6 +305,7 @@ public class Assignments extends GAME_OBJECT{
             {
                 grade--;
                 assignment_sprite = sprite_animations[grade];
+                isReadyToDie = true;
             }
         }
     }
@@ -300,10 +313,10 @@ public class Assignments extends GAME_OBJECT{
     //called when the player hit the assignment
     public void player_hit()
     {
-        if(!isAwesome && !isBad)
+        //if(!isAwesome && !isBad)
         {
             isReadyToDie = true;
-            print("Assignment collected!");
+            //print("Assignment collected!");
         }
     }
 
@@ -318,6 +331,9 @@ public class Assignments extends GAME_OBJECT{
     public float getBody_Y()
     {return assignment_body.getPosition().y;}
 
+    public boolean isBad(){return  isBad;}
+
+    public boolean isAwesome(){return isAwesome;}
 
     //asks if is is ready to die
     public boolean isTimerDone()

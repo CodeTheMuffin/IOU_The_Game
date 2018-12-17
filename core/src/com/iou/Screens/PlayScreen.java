@@ -162,32 +162,18 @@ public class PlayScreen implements Screen, InputProcessor {
             player.draw_me(game.batch);
             //player.getSprite().draw( game.batch );
 
+            /*
             if(debugAssignment != null)
             {
                 if(!debugAssignment.isTimerDone())
                     debugAssignment.draw_me( game.batch );
                 else
                     debugAssignment = null;
-            }
+            }*/
 
 
             player.draw_pencils( game.batch );
-            /*
-            //draw valid pencils, remove unnecessary ones
-            for(int i= 0;i<player.Player_Pencils.size(); i++)//for(Pencil pencil: player.Player_Pencils)
-            {
-                Pencil pencil = player.Player_Pencils.get( i );
-
-                if(!pencil.isTimerDone())
-                    pencil.draw_me(game.batch);
-                else
-                {
-                    player.Player_Pencils.remove( i );
-                    i--;
-                    //player.Player_Pencils.remove( pencil );
-                }
-                //pencil.get_Pencil_sprite().draw( game.batch );
-            }*/
+            Spawner.draw_spawns( game.batch, main_world );
 
 
         game.batch.end();
@@ -197,6 +183,12 @@ public class PlayScreen implements Screen, InputProcessor {
 		game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
 
 		hud.stage.draw();
+
+		/*
+		* Delete bodies
+		* */
+        player.DeleteBodies(main_world);
+        Spawner.DeleteBodies( main_world );
 
     }
 
@@ -321,11 +313,17 @@ public class PlayScreen implements Screen, InputProcessor {
                 {
                     if(isAssignment)//if objA or objB is an Assignments object
                     {
+                        player.total_grade+= contactAssignment.get(0).getGrade();
                         contactAssignment.get(0).player_hit();//decrement assignment's grade, if allowed
+                        player.assignment_collected();
                     }
                     else if(isWall)//if objA or objB is an Assignments object
                     {
-
+                        if(contactWall.get( 0 ).curr_wall_position == Wall.wall_position.DOWN)
+                        {
+                            player.jumping= false;
+                            player.onGround = true;
+                        }
                     }
                     else if(isEDrink)//if objA or objB is an Energy_Drink object
                     {
@@ -342,6 +340,7 @@ public class PlayScreen implements Screen, InputProcessor {
                         {
                             //TODO: Take some points off for 'lateness' and apply grading
                             //      Get rid of Assignment
+                            contactAssignment.get(0).wall_hit();
                         }
                     }
                     else if(isPencil)//if objA or objB is a Pencil object
@@ -368,13 +367,11 @@ public class PlayScreen implements Screen, InputProcessor {
                 //print("is bodyB the player or ground?: "+ (bodyB==player_body)+"\t"+ (bodyB== floor_body));
 
 
-
-
                 if((bodyA == player_body && bodyB == floor_body) || (bodyB == player_body && bodyA == floor_body))
                 {
                     //print("\t\tColliding with ground.");
-                    player.jumping= false;
-                    player.onGround = true;
+                    //player.jumping= false;
+                    //player.onGround = true;
                 }
 
                 //print("jumping: "+ jumping +"\tOnGround: "+ onGround);

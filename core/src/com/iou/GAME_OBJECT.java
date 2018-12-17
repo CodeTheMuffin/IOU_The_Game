@@ -10,8 +10,8 @@ public class GAME_OBJECT {
     public final static float MIN_START_Y = IOU.HEIGHT*0.125f;//in pixels
     public final static float DIFF_START_Y = MAX_START_Y - MIN_START_Y;//in pixels
 
-    public final static float MAX_START_SPEED = IOU.HEIGHT*0.6f;//in meters
-    public final static float MIN_START_SPEED = IOU.HEIGHT*0.125f;//in meters
+    public final static float MAX_START_SPEED = -8f;//in meters
+    public final static float MIN_START_SPEED = -3;//in meters
     public final static float DIFF_START_SPEED = MAX_START_SPEED - MIN_START_SPEED;//in meters
 
 

@@ -37,12 +37,18 @@ public class Player {//implements InputProcessor {
     int left_center_right = 0;// -1 left    0 center   +1 right
 
     private int assignments_collected= 0, assignments_needed = 10, assignments_allowed = 15;
+    public int total_grade = 0;
     private int eDrinks_collected = 0, eDrinks_allowed = 5;//can only collect up to 5 drinks a level
     private int level= 0;
     private Timer level_timer;
 
+    private ArrayList<Body > BodiesToBeDeleted;
+
     //FOR THE PENCILS being thrown
     public ArrayList< Pencil > Player_Pencils;
+
+
+
 
     public Player(World world, Batch the_batch)
     {
@@ -62,7 +68,7 @@ public class Player {//implements InputProcessor {
     public void setup()
     {
         player_sprite.setColor( Color.BLUE );
-
+        BodiesToBeDeleted = new ArrayList<Body>();
         //print("Are the world's the same?: "+ main_world + "\t"+getWorld());
 
         //create a body definition for the player
@@ -90,7 +96,6 @@ public class Player {//implements InputProcessor {
           //      player_sprite.getHeight() / 2 / PIXELS_PER_METER );
 
         shape.setAsBox( player_world_width/2, player_world_height/2 );//20,40
-
 
         player_sprite.setSize( player_world_width,player_world_height );
         //able to link sprite with body's scaling and rotations (even if they aren't being used in-game)
@@ -184,7 +189,7 @@ public class Player {//implements InputProcessor {
     //draw pencils if they can
     public void draw_pencils(Batch batch)
     {
-        print("drawing pencils: "+ Player_Pencils.size());
+        //print("drawing pencils: "+ Player_Pencils.size());
         //draw valid pencils, remove unnecessary ones
         for(int i= 0;i<Player_Pencils.size(); i++)//for(Pencil pencil: player.Player_Pencils)
         {
@@ -200,6 +205,7 @@ public class Player {//implements InputProcessor {
                         //pencil.destroy();
                     }*/
 
+                BodiesToBeDeleted.add( pencil.getBody() );
                 Player_Pencils.remove( i );
                 i--;
 
@@ -302,6 +308,19 @@ public class Player {//implements InputProcessor {
 
     public void reset_eDrinks_collected()
     {eDrinks_collected=0;}
+
+    //delete bodies that are ready to be dead
+    public void DeleteBodies(World world)
+    {
+        for(Body body: BodiesToBeDeleted)
+        {
+            world.destroyBody( body );
+        }
+        BodiesToBeDeleted.clear();
+    }
+
+    public void assignment_collected()
+    {assignments_collected++;}
 
     public Sprite getSprite()
     {return player_sprite;}
