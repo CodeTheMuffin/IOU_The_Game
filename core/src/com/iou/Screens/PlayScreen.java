@@ -22,9 +22,12 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.iou.Assignments;
+import com.iou.Energy_Drink;
+import com.iou.GAME_OBJECT;
 import com.iou.IOU;
 import com.iou.Pencil;
 import com.iou.Player;
+import com.iou.SpawnManager;
 import com.iou.Wall;
 import com.iou.HUD.HUD;
 
@@ -53,10 +56,13 @@ public class PlayScreen implements Screen, InputProcessor {
     private Box2DDebugRenderer box2DDR;
     private Matrix4 debugMatrix;
     private boolean hitCtrl = false; //if user is hitting CTRL (used for faster scrolling in debug mode)
+    public int level = 1;
 
 	private HUD hud;
 	
     public Assignments debugAssignment;//TODO: to delete later;
+
+    public SpawnManager Spawner;
 
     public PlayScreen( IOU the_game)
     {
@@ -100,7 +106,10 @@ public class PlayScreen implements Screen, InputProcessor {
         right_wall  = new Wall(player, Wall.wall_position.RIGHT);
         ceiling     = new Wall(player, Wall.wall_position.UP);
 
-        debugAssignment  = new Assignments( main_world );
+        //debugAssignment  = new Assignments( main_world );
+        debugAssignment  = new Assignments( main_world , -1,100, GAME_OBJECT.generate_starting_Y());
+
+        Spawner = new SpawnManager( level, game.batch, main_world );
 
         //print("screen width: "+ Gdx.graphics.getWidth()+"\theight: "+ Gdx.graphics.getHeight());
         CreateContactListener();
@@ -222,48 +231,127 @@ public class PlayScreen implements Screen, InputProcessor {
                 Object objA = bodyA.getUserData();
                 Object objB = bodyB.getUserData();
 
+                //There is only one player so I don't need to add it to anything, besides PlayScreen has a reference
+                //  to the only Player object!
                 ArrayList<Wall> contactWall = new ArrayList<Wall>();
                 ArrayList<Assignments> contactAssignment = new ArrayList<Assignments>();
                 ArrayList<Pencil> contactPencil = new ArrayList<Pencil>();
+                ArrayList<Energy_Drink> contactE_Dirnk = new ArrayList<Energy_Drink>();
 
                 //ONLY CARE ABOUT WHEN:
                 /*
                 * Player and Assignment Hit:
                 *   - Collect Assignment AS IS, apply grade, and get rid of assignment.
                 *
-                *  Assignment and Wall:
-                *   - if LEFT wall:
-                *       - Collect assignment, apply 'late' grade, and get rid of assignment
+                * Player and Bottom Wall (floor):
+                *   - Active jumping (set isGround to true)
                 *
                 * Player and E-Drink:
                 *   - Apply boost, get rid of E-Drink
                 *
+                *  Assignment and Wall:
+                *   - if LEFT wall:
+                *       - Collect assignment, apply 'late' grade, and get rid of assignment
+                *
+                *  Assignment and Pencil:
+                *   - if allowed, increase grade of assignment.
                 * */
 
-
-                boolean isPencil =false, isWall = false, isPlayer = false, isAssignment = false;
+                boolean isPencil =false, isWall = false, isPlayer = false, isAssignment = false, isEDrink = false;
                 //for wall, only care about the left wall with assignments
 
-                print("objA: "+ objA.getClass()+"\tobjB: "+ objB.getClass());
+                //print("objA: "+ objA.getClass()+"\tobjB: "+ objB.getClass());
+
+                //OBJECT A
                 if(objA instanceof  Pencil)//if(objA instanceof Pencil || objB instanceof Pencil)
                 {
                     isPencil = true;
                     contactPencil.add( (Pencil)objA );
                 }
+                else if(objA instanceof Wall)
+                {
+                    isWall = true;
+                    contactWall.add( (Wall)objA );
+                }
+                else if(objA instanceof Assignments)
+                {
+                    isAssignment = true;
+                    contactAssignment.add( (Assignments) objA );
+                }
+                else if(objA instanceof Player)
+                {
+                    isPlayer = true;
+                }
+                else if(objA instanceof Energy_Drink)
+                {
+                    isEDrink = true;
+                    contactE_Dirnk.add( (Energy_Drink) objA );
+                }
 
-                if(objB instanceof  Pencil)
+                //OBJECT B
+                if(objB instanceof  Pencil)//if(objA instanceof Pencil || objB instanceof Pencil)
                 {
                     isPencil = true;
                     contactPencil.add( (Pencil)objB );
                 }
-
-                if(objA instanceof  Pencil)//if(objA instanceof Pencil || objB instanceof Pencil)
+                else if(objB instanceof Wall)
                 {
-                    isPencil = true;
-                    contactPencil.add( (Pencil)objA );
+                    isWall = true;
+                    contactWall.add( (Wall)objB );
+                }
+                else if(objB instanceof Assignments)
+                {
+                    isAssignment = true;
+                    contactAssignment.add( (Assignments) objB );
+                }
+                else if(objB instanceof Player)
+                {
+                    isPlayer = true;
+                }
+                else if(objB instanceof Energy_Drink)
+                {
+                    isEDrink = true;
+                    contactE_Dirnk.add( (Energy_Drink) objB );
                 }
 
-                print( "\tWas it a pencil?: "+ isPencil );
+                ////////////////////
+                // CONTACT CHECKS //
+                ////////////////////
+                if(isPlayer)//if objA or objB is the player
+                {
+                    if(isAssignment)//if objA or objB is an Assignments object
+                    {
+                        contactAssignment.get(0).player_hit();//decrement assignment's grade, if allowed
+                    }
+                    else if(isWall)//if objA or objB is an Assignments object
+                    {
+
+                    }
+                    else if(isEDrink)//if objA or objB is an Energy_Drink object
+                    {
+
+                    }
+                }
+                else if(isAssignment)//if objA or objB is an Assignments object
+                {
+                    if(isWall)//if objA or objB is a Wall object
+                    {
+                        //if the wall is in the LEFT position
+                        //Assume that there will be at least one Wall object in the array list.
+                        if(contactWall.get(0).curr_wall_position == Wall.wall_position.LEFT)
+                        {
+                            //TODO: Take some points off for 'lateness' and apply grading
+                            //      Get rid of Assignment
+                        }
+                    }
+                    else if(isPencil)//if objA or objB is a Pencil object
+                    {
+                        contactAssignment.get(0).pencil_hit();//increment assignment's grade, if allowed
+                        contactPencil.get(0).set_to_DIE();
+
+                        //contactPencil.get(0).destroy();//get rid of pencil
+                    }
+                }
 
 
 
@@ -279,14 +367,7 @@ public class PlayScreen implements Screen, InputProcessor {
                 //print("is bodyA the player or ground?: "+ (bodyA==player_body)+"\t"+ (bodyA== floor_body));
                 //print("is bodyB the player or ground?: "+ (bodyB==player_body)+"\t"+ (bodyB== floor_body));
 
-                if(bodyB.getUserData().getClass() == Wall.class)
-                {
-                    //print("\tIt's a: "+ ((Wall)bodyB.getUserData()).curr_wall_position);
-                }
-                else
-                {
-                    //print("\tIt's a: "+ bodyB.getUserData().getClass());
-                }
+
 
 
                 if((bodyA == player_body && bodyB == floor_body) || (bodyB == player_body && bodyA == floor_body))
@@ -468,11 +549,13 @@ public class PlayScreen implements Screen, InputProcessor {
             camera.viewportWidth += amount;
             camera.viewportHeight += amount;
 
+            /*
             print("[Camera ViewPort & Position]");
             print("\tWidth : " + camera.viewportWidth);
             print("\tHeight: "+ camera.viewportHeight);
             print("\tX: "+ camera.position.x + "\tY: "+ camera.position.y);
             print("==============");
+            */
 
         }
 

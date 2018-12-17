@@ -36,6 +36,11 @@ public class Player {//implements InputProcessor {
     final float player_world_height = player_height_px / PIXELS_PER_METER;
     int left_center_right = 0;// -1 left    0 center   +1 right
 
+    private int assignments_collected= 0, assignments_needed = 10, assignments_allowed = 15;
+    private int eDrinks_collected = 0, eDrinks_allowed = 5;//can only collect up to 5 drinks a level
+    private int level= 0;
+    private Timer level_timer;
+
     //FOR THE PENCILS being thrown
     public ArrayList< Pencil > Player_Pencils;
 
@@ -106,6 +111,56 @@ public class Player {//implements InputProcessor {
         shape.dispose();
     }
 
+    public void setup_level(int lvl)
+    {
+        level = lvl;
+        reset_assignments_collected();
+        reset_eDrinks_collected();
+        float seconds= 10f;
+
+        //the levels are the years
+        if(level == 1)
+        {
+            //REQ_hw = 5;REQ_projects = 2;
+            assignments_needed = 5;
+            assignments_allowed = 10;
+            seconds = 10f;
+        }
+        else if(level == 2)
+        {
+            //REQ_hw = 8;REQ_projects = 3;
+            assignments_needed = 8;
+            assignments_allowed = 10;
+            seconds = 20f;
+        }
+        else if (level == 3)
+        {
+            //REQ_hw = 10;REQ_projects = 4;
+            assignments_needed = 10;
+            assignments_allowed = 15;
+            seconds = 30f;
+        }
+        else if (level == 4)
+        {
+            //REQ_hw = 12;REQ_projects = 6;
+            assignments_needed = 12;
+            assignments_allowed = 15;
+            seconds = 40f;
+        }
+
+        level_timer = new Timer(seconds);
+    }
+
+    public void isLevelDone()
+    {
+        if(level_timer.isTimeUp())
+        {
+            //TODO: PAUSE, HAVE POP-UP, (once closed), increment level, reposition player,
+            //reset spawner (in PlayScreen), reset level.
+        }
+
+    }
+
     //assuming that the batch has begun and ended before calling this method
     public void draw_me( Batch batch)
     {
@@ -136,10 +191,21 @@ public class Player {//implements InputProcessor {
 
             if(!pencil.isTimerDone())
                 pencil.draw_me(batch);
-            else
+            else//if timer is done or if ready to die
             {
+
+
+                /* This broke the program
+                    if(pencil.get_pencil_body() != null)//if there is still a body, get rid of it in the world!
+                    {
+                        //pencil.destroy();
+                    }*/
+
                 Player_Pencils.remove( i );
                 i--;
+
+                if(Player_Pencils.size() ==0)
+                    break;
                 //player.Player_Pencils.remove( pencil );
             }
             //pencil.get_Pencil_sprite().draw( game.batch );
@@ -226,6 +292,18 @@ public class Player {//implements InputProcessor {
         }
     }
 
+    public void increment_assignments_collected()
+    {assignments_collected++;}
+
+    public void increment_eDrinks_collected()
+    {eDrinks_collected++; }
+
+    public void reset_assignments_collected()
+    {assignments_collected=0;}
+
+    public void reset_eDrinks_collected()
+    {eDrinks_collected=0;}
+
     public Sprite getSprite()
     {return player_sprite;}
 
@@ -239,10 +317,14 @@ public class Player {//implements InputProcessor {
     public float getBody_Y(){return player_body.getPosition().y;}
     public Vector2 getBody_POS(){return player_body.getPosition();}//get position
 
+
+
     public void print_position()
     {
         print(this.getClass()+"\n\tx: "+getBody_X()+"\ty: "+ getBody_Y());
     }
+
+    //called if we want to remove something from the collection of pencils
     public void removePencil(Pencil pen)
     {
         if(Player_Pencils.contains( pen ))
@@ -353,7 +435,7 @@ public class Player {//implements InputProcessor {
         if(isPaused)
             return false;
 
-        print("jumping: "+ jumping +"\tOnGround: "+ onGround);
+        //print("jumping: "+ jumping +"\tOnGround: "+ onGround);
         int index = allkeysPressed.indexOf( keycode );
         if(index != -1)
             allkeysPressed.remove( index );
@@ -370,7 +452,7 @@ public class Player {//implements InputProcessor {
 			onGround = false;
 		}*/
 
-        print("\tAfter: jumping: "+ jumping +"\tOnGround: "+ onGround);
+        //print("\tAfter: jumping: "+ jumping +"\tOnGround: "+ onGround);
         return true;
     }
 

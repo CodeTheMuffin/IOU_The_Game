@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 
 import static com.iou.IOU.PIXELS_PER_METER;
 import static com.iou.IOU.print;
@@ -40,7 +41,6 @@ public class Pencil {
         {    player= the_player;}
 
         setup();
-
     }
 
     //setup the pencil's box2D properties
@@ -61,13 +61,12 @@ public class Pencil {
         //bullet_bodyDef.position.set( ( player.getSprite().getX() + player.getSprite().getWidth()+50  ) ,
                 //( player.getSprite().getY() + player.getSprite().getHeight() / 2 ) );
 
-        player.print_position();
+        //player.print_position();
         float new_x = player.getBody_X()+ (player.getSprite().getWidth()/2/PIXELS_PER_METER);
         new_x = player.getBody_X() +0.51f;
 
-        print("trying to set bullet x: "+ new_x);
-        bullet_bodyDef.position.set(new_x,
-                player.getBody_Y());
+        //print("trying to set bullet x: "+ new_x);
+        bullet_bodyDef.position.set(new_x,player.getBody_Y());
 
         bullet_body = player.getWorld().createBody( bullet_bodyDef );
 
@@ -140,6 +139,9 @@ public class Pencil {
         }
         else
         {
+            //just added
+            destroy();
+
             bullet_sprite = null;// to be thrown away
         }
 
@@ -180,8 +182,24 @@ public class Pencil {
     public void destroy()
     {
         isReadyToDie = true;
-        player.getWorld().destroyBody( bullet_body );
+        if(bullet_body != null)
+        {
+            player.getWorld().destroyBody( bullet_body );
+        }
     }
+
+    public void destroy(World the_world)
+    {
+        isReadyToDie = true;
+        if(bullet_body != null)
+        {
+            player.getWorld().destroyBody( bullet_body );
+        }
+    }
+
+    //should be called when the pencil hits something, ie, an assignment
+    public void set_to_DIE()
+    {isReadyToDie = true;}
 
     //asks if is is ready to die
     public boolean isTimerDone()

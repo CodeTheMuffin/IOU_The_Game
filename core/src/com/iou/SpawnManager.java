@@ -6,6 +6,12 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.physics.box2d.World;
 
 import java.util.ArrayList;
+import java.util.Random;
+
+
+import static com.iou.GAME_OBJECT.generate_speed;
+import static com.iou.GAME_OBJECT.generate_starting_Y;
+
 
 public class SpawnManager {
     private int REQ_hw= 100, REQ_projects = 100;//the number of required hw/projects player must complete
@@ -19,13 +25,16 @@ public class SpawnManager {
     private World world;
     private int current_level = 1;
 
-    public ArrayList< Assignments> assignments_spawned;
+    //the difference between the max and min start Y values for Assignments
+    //private final static float Y_Start_diff =  MAX_START_Y- MIN_START_Y;
+
+    public ArrayList< Assignments> Assignments_Spawned;
 
     public SpawnManager(int level, Batch b, World w)
     {
         batch = b;
         world = w;
-        assignments_spawned= new ArrayList<Assignments>();
+        Assignments_Spawned= new ArrayList<Assignments>();
         spawn_timer = new Timer(spawn_timer_duration);
         spawned= 0;
         setup(level);
@@ -34,7 +43,7 @@ public class SpawnManager {
     private void setup(int level)
     {
         current_level = level;
-        assignments_spawned.clear();
+        Assignments_Spawned.clear();
 
         //the levels are the years
         if(level == 1)
@@ -65,18 +74,46 @@ public class SpawnManager {
 
     public int get_current_lvl(){return current_level;}
 
+
+
+
+
+
     //checks if its time to spawn
     public void manage()
     {
         if(spawn_timer.isTimeUp())
         {
-            //ready to spawn!
-            assignments_spawned.add(new Assignments(world));
+            float the_starting_Y = generate_starting_Y();
+
+            //Assignments_Spawned.add(new Assignments(world));
+            Assignments_Spawned.add(new Assignments(world, -5f, 5f, the_starting_Y));
             spawn_timer.resetTimer();
         }
     }
 
+    public void draw_spawns(Batch the_batch, World the_world)
+    {
+        for(int i = 0; i< Assignments_Spawned.size(); i++)
+        {
+            Assignments assignment = Assignments_Spawned.get( i );
 
+            if(!assignment.isTimerDone())
+                assignment.draw_me(the_batch);
+            else//if timer is done or if ready to die
+            {
+                if(assignment.getBody() != null)//if there is still a body, get rid of it in the world!
+                {
+                    //assignment.destroy();
+                    assignment.destroy(world);
+                }
+
+                Assignments_Spawned.remove( i );
+                i--;
+            }
+        }
+
+    }
 
 
 }

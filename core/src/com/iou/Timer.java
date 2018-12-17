@@ -12,7 +12,7 @@ public class Timer {
     public Timer(float seconds)
     {
         duration = (long)(seconds*SECOND_TO_NANO);
-        print("seconds: "+ seconds + "\nduration: "+duration+"\n");
+        //print("seconds: "+ seconds + "\nduration: "+duration+"\n");
     }
 
     public Timer(long nanoseconds)

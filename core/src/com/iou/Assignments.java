@@ -11,7 +11,9 @@ import java.util.Random;
 import static com.iou.IOU.PIXELS_PER_METER;
 import static com.iou.IOU.print;
 
-public class Assignments {
+
+
+public class Assignments extends GAME_OBJECT{
     //something to hold all the sprite animations
     public final static Sprite[] sprite_animations = new Sprite[7];
 
@@ -36,7 +38,15 @@ public class Assignments {
 
     //startX=(IOU.WIDTH/2) + Wall.extra_space
     private float startX=(IOU.WIDTH /2) + assignment_width_px*.75f;//, startY= IOU.HEIGHT/2;//in pixels
-    private float startY = IOU.HEIGHT*0.6f;
+    private float startY = IOU.HEIGHT*.125f;
+
+    /*
+    public final static float MAX_START_Y = IOU.HEIGHT*0.6f;//in pixels
+    public final static float MIN_START_Y = IOU.HEIGHT*0.125f;//in pixels
+
+    public final static float MAX_SPEED = IOU.HEIGHT*0.6f;//in meters
+    public final static float MIN_SPEED = IOU.HEIGHT*0.125f;//in meters
+    */
 
     public boolean isBad = false; //some assignments are always bad, regardless how much work you put into them!
     public int bad_chance = 50; // used for generating the chance of getting a bad assignment
@@ -79,6 +89,26 @@ public class Assignments {
         pre_setup( w );
     }
 
+    public Assignments(World w, float speed, float seconds, float starting_Y)
+    {
+        if( speed <0f && speed >= -15f)
+            vx= speed;
+        print("ASS: speed: "+ speed +"\tvx: "+ vx);
+
+        if(seconds > 0f && seconds<= 10f)
+            test_timer= new Timer(seconds);
+        else
+            test_timer= new Timer(5f);//default is 5 seconds
+
+        if(starting_Y>= MIN_START_Y && starting_Y <= MAX_START_Y)
+            startY = starting_Y;
+
+        print("\tthe starting Y: "+ starting_Y);
+
+        pre_setup( w );
+    }
+
+
     //created pre_setup just in case there is time to make Classes related (ie. have classes extend other classes)
     private void pre_setup(World w)
     {
@@ -89,7 +119,6 @@ public class Assignments {
 
         setup();
     }
-
 
     private int getArraySize(Sprite[] A)
     {
@@ -177,7 +206,7 @@ public class Assignments {
 
         assignment_sprite.setPosition( getBody_X(), getBody_Y());
 
-        //assignment_body.setLinearVelocity( vx,0 );
+        assignment_body.setLinearVelocity( vx,0 );
 
         assignment_body.setUserData( this );
 
@@ -227,7 +256,19 @@ public class Assignments {
     public void destroy()
     {
         isReadyToDie = true;
-        world.destroyBody( assignment_body );
+        if(assignment_body != null)
+        {
+            world.destroyBody( assignment_body );
+        }
+    }
+
+    public void destroy(World the_world)
+    {
+        isReadyToDie = true;
+        if(assignment_body != null)
+        {
+            the_world.destroyBody( assignment_body );
+        }
     }
 
     //called when a pencil hit the assignment
@@ -246,13 +287,24 @@ public class Assignments {
     //called when assignment hit the left wall (will be coded that way in PlayScreen)
     public void wall_hit()
     {
-
+        if(!isAwesome && !isBad)
+        {
+            if(grade -1 >= 0)
+            {
+                grade--;
+                assignment_sprite = sprite_animations[grade];
+            }
+        }
     }
 
     //called when the player hit the assignment
     public void player_hit()
     {
-
+        if(!isAwesome && !isBad)
+        {
+            isReadyToDie = true;
+            print("Assignment collected!");
+        }
     }
 
 
@@ -265,6 +317,7 @@ public class Assignments {
 
     public float getBody_Y()
     {return assignment_body.getPosition().y;}
+
 
     //asks if is is ready to die
     public boolean isTimerDone()
