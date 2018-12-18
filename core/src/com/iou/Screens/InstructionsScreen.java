@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -31,7 +32,10 @@ public class InstructionsScreen implements Screen {
     Label jumpControls;
     Label attackControls;
     Label collectProjects;
-    private Texture background;
+    Label pauseKey;
+    private Sprite background;
+    private Sprite spaceBar;
+    private Sprite eKey;
 
     public InstructionsScreen(IOU game){
         this.game = game;
@@ -40,7 +44,20 @@ public class InstructionsScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         //below was in show()
-        background = new Texture("badlogic.jpg");
+        //find better background for instruction screens
+        //background = new Sprite(new Texture("school-background.jpg"));
+        //background.setPosition(0,0);
+        //background.setSize(IOU.WIDTH, IOU.HEIGHT);
+
+        //enter key sprite
+        eKey = new Sprite(new Texture("enterKey.png"));
+        eKey.setPosition(IOU.WIDTH/4,IOU.HEIGHT/2-75);
+        eKey.setSize(60,50);
+
+        //spacebar sprite
+        spaceBar = new Sprite(new Texture("spaceBar.png"));
+        spaceBar.setPosition(IOU.WIDTH/5, IOU.HEIGHT/2);
+        spaceBar.setSize(125, 50);
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal
                 ("fonts/Letters_for_Learners/Letters for Learners.ttf"));
@@ -93,6 +110,10 @@ public class InstructionsScreen implements Screen {
         collectProjects = new Label("Collect the projects by touching them with the\n player", new Label.LabelStyle(font, Color.BLACK));
         collectProjects.setPosition(IOU.WIDTH/3,IOU.HEIGHT/2-150);
 
+        pauseKey = new Label("Press Esc to pause the game.", new Label.LabelStyle(font, Color.BLACK));
+        pauseKey.setPosition(IOU.WIDTH/3, IOU.HEIGHT/2-200);
+
+        stage.addActor(pauseKey);
         stage.addActor(greetings);
         stage.addActor(intro);
         stage.addActor(attackControls);
@@ -115,6 +136,9 @@ public class InstructionsScreen implements Screen {
 
         game.batch.begin();
         // game.batch.draw(background,game.WIDTH,game.HEIGHT);
+        //background.draw(game.batch);
+        eKey.draw(game.batch);
+        spaceBar.draw(game.batch);
         game.batch.end();
         stage.draw();
     }

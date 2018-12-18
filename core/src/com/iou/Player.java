@@ -38,6 +38,7 @@ public class Player {//implements InputProcessor {
 
     private int assignments_collected= 0, assignments_needed = 10, assignments_allowed = 15;
     public int total_grade = 0;
+    private int scholarshipMoney = 0;
     private int eDrinks_collected = 0, eDrinks_allowed = 5;//can only collect up to 5 drinks a level
     private int level= 0;
     private Timer level_timer;
@@ -295,6 +296,36 @@ public class Player {//implements InputProcessor {
             }
             //print("===============================");
         }
+    }
+
+    public void calculateFinalGrade( int totalGrade, int assignmentsAllowedGradeTotal){
+        if(totalGrade <= assignmentsAllowedGradeTotal*4 && totalGrade >assignmentsAllowedGradeTotal*3){
+            scholarshipMoney = 3000;
+        }
+        if(totalGrade <= assignmentsAllowedGradeTotal*3 && totalGrade >assignmentsAllowedGradeTotal*2){
+            scholarshipMoney = 1500;
+        }
+        if(totalGrade <= assignmentsAllowedGradeTotal*2 && totalGrade >assignmentsAllowedGradeTotal*1){
+            scholarshipMoney = 500;
+        }
+        else{
+            scholarshipMoney = 0;
+        }
+    }
+    public int getScholarshipMoney(){
+        return scholarshipMoney;
+    }
+
+    public void setScholarshipMoney(int newscholaramount){
+        scholarshipMoney = newscholaramount;
+    }
+
+    public int getTotalGrade(){
+        return total_grade;
+    }
+
+    public int getAssignments_allowed(){
+        return assignments_allowed;
     }
 
     public void increment_assignments_collected()

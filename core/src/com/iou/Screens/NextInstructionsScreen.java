@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -26,7 +27,8 @@ public class NextInstructionsScreen implements Screen {
     Label prev;
     Label returnMenu;
     Label LevelComplete;
-    private Texture background;
+    private Sprite background;
+    private Sprite caffeineBar;
 
     public NextInstructionsScreen(IOU game){
         this.game = game;
@@ -36,6 +38,12 @@ public class NextInstructionsScreen implements Screen {
 
 
         //below was in show()
+
+        //find better background for instruction screens
+        //background = new Sprite(new Texture("school-background.jpg"));
+        //background.setPosition(0,0);
+        //background.setSize(IOU.WIDTH, IOU.HEIGHT);
+
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal
                 ("fonts/Letters_for_Learners/Letters for Learners" +
                         ".ttf"));
@@ -44,14 +52,17 @@ public class NextInstructionsScreen implements Screen {
 
         final BitmapFont font = generator.generateFont(parameter);
 
+        caffeineBar = new Sprite(new Texture(Gdx.files.internal("JamesBar_small.png")));
+        caffeineBar.setPosition(IOU.WIDTH/2 -150, IOU.HEIGHT/2+100);
+
         caffeineMechanic = new Label("The caffeine meter shows how much caffeine the player has left."+
                 " To increase the\ncaffeine level you need to collect the coffee cups flying towards you." +
                 " Once at \nmax caffeine level the player will have increase throwing and movement speed.", new Label.LabelStyle(font, Color.BLACK));
-        caffeineMechanic.setPosition(IOU.WIDTH/8,300);
+        caffeineMechanic.setPosition(IOU.WIDTH/8,IOU.HEIGHT/2);
 
         LevelComplete = new Label("Once a level is complete the total debit remaining will be calculated\n and the interest shall be applied for the next level."
                 , new Label.LabelStyle(font, Color.BLACK));
-        LevelComplete.setPosition(IOU.WIDTH/8, 200);
+        LevelComplete.setPosition(IOU.WIDTH/8, IOU.HEIGHT/2-100);
 
         prev = new Label("Previous", new Label.LabelStyle(font, Color.BLACK));
         prev.setPosition(IOU.WIDTH/10,50);
@@ -99,6 +110,8 @@ public class NextInstructionsScreen implements Screen {
 
         game.batch.begin();
         // game.batch.draw(background,game.WIDTH,game.HEIGHT);
+        //background.draw(game.batch);
+        caffeineBar.draw(game.batch);
         game.batch.end();
         stage.draw();
     }

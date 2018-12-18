@@ -427,6 +427,12 @@ public class PlayScreen implements Screen, InputProcessor {
                     camera.position.y += cam_speed;
                     break;
                 }
+                //to get to gameOverScreen
+                case Input.Keys.Q:{
+                    game.setScreen(new GameOverScreen(game, player));
+                    System.out.println(player.total_grade);
+                    break;
+                }
                 case Input.Keys.NUMPAD_2:{
                     camera.position.y -= cam_speed;
                     break;

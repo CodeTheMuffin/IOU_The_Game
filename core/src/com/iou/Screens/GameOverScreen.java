@@ -17,20 +17,25 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.iou.HUD.HUD;
 import com.iou.IOU;
+import com.iou.Player;
 
 public class GameOverScreen implements Screen {
     final IOU game;
+    private static Player player;
+    private HUD hud;
     private final Viewport viewport;
-    private double finalDebt = HUD.getDebtOwed();
+    private double finalDebt = hud.getDebtOwed();
     private Stage stage;
     Label gameOver;
     Label finalScore;
     Label returnMain;
     Label quit;
+    Label scholarshipEarned;
     private Texture background;
 
-    public GameOverScreen(IOU game){
+    public GameOverScreen(IOU game, Player player){
         this.game = game;
+        this.player = player;
         viewport = new FitViewport(IOU.WIDTH, IOU.HEIGHT, new OrthographicCamera());
         stage= new Stage(viewport, game.batch);
         Gdx.input.setInputProcessor(stage);
@@ -38,6 +43,8 @@ public class GameOverScreen implements Screen {
 
     @Override
     public void show() {
+        player.calculateFinalGrade(player.getTotalGrade(),player.getAssignments_allowed());
+
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal
                 ("fonts/Letters_for_Learners/Letters for Learners.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -45,9 +52,9 @@ public class GameOverScreen implements Screen {
         final BitmapFont font = generator.generateFont(parameter);
 
         returnMain = new Label("Return to Main Menu", new Label.LabelStyle(font, Color.BLACK));
-        returnMain.setPosition(IOU.WIDTH/2-100,IOU.HEIGHT/2);
+        returnMain.setPosition(IOU.WIDTH/2-100,IOU.HEIGHT/2-50);
         returnMain.setTouchable(Touchable.enabled);
-        returnMain.setBounds(IOU.WIDTH/2-100,IOU.HEIGHT/2,returnMain.getWidth(),returnMain.getHeight());
+        returnMain.setBounds(IOU.WIDTH/2-100,IOU.HEIGHT/2-50,returnMain.getWidth(),returnMain.getHeight());
         returnMain.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
@@ -58,9 +65,9 @@ public class GameOverScreen implements Screen {
         });
 
         quit = new Label("Quit", new Label.LabelStyle(font, Color.BLACK));
-        quit.setPosition(IOU.WIDTH/2-25,IOU.HEIGHT/2-50);
+        quit.setPosition(IOU.WIDTH/2-25,IOU.HEIGHT/2-100);
         quit.setTouchable(Touchable.enabled);
-        quit.setBounds(IOU.WIDTH/2-25,IOU.HEIGHT/2-50,quit.getWidth(),quit.getHeight());
+        quit.setBounds(IOU.WIDTH/2-25,IOU.HEIGHT/2-100,quit.getWidth(),quit.getHeight());
         quit.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
@@ -71,13 +78,17 @@ public class GameOverScreen implements Screen {
         gameOver = new Label("Game Over", new Label.LabelStyle(font,Color.BLACK));
         gameOver.setPosition(IOU.WIDTH/2-50, IOU.HEIGHT/2+100);
 
-        finalScore = new Label("Final Debt amount is: $"+finalDebt, new Label.LabelStyle(font, Color.BLACK));
+        finalScore = new Label("Final Debt amount is: $"+(finalDebt-player.getScholarshipMoney()), new Label.LabelStyle(font, Color.BLACK));
         finalScore.setPosition(IOU.WIDTH/2-100, IOU.HEIGHT/2+50);
+
+        scholarshipEarned = new Label("Scholarship: $"+player.getScholarshipMoney(), new Label.LabelStyle(font, Color.BLACK));
+        scholarshipEarned.setPosition(IOU.WIDTH/2-50, IOU.HEIGHT/2);
 
         stage.addActor(returnMain);
         stage.addActor(quit);
         stage.addActor(gameOver);
         stage.addActor(finalScore);
+        stage.addActor(scholarshipEarned);
 
     }
 

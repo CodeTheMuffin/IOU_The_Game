@@ -29,7 +29,7 @@ public class HUD implements Disposable {
 
     private Viewport hudViewport;
     private PlayScreen the_playScreen;
-    private static Integer debtOwed;
+    private static Integer debtOwed = 10000;
 
     public Label Debt;
     public static Label debtAmount;
@@ -43,7 +43,7 @@ public class HUD implements Disposable {
 
     public HUD(SpriteBatch spriteBatch, PlayScreen the_playScreen){
         this.the_playScreen = the_playScreen;
-        debtOwed = 10000;
+        //debtOwed = 10000;
 
         Skin skin = new Skin(Gdx.files.internal("Ui Skins/uiskin.json"));
 

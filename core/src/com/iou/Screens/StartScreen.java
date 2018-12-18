@@ -89,7 +89,7 @@ public class StartScreen implements Screen {
                     ( "fonts/Letters_for_Learners/Letters for Learners" +
                             ".ttf" ) );
             FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-            parameter.size = 26;
+            parameter.size = 40;
 
             final BitmapFont font = generator.generateFont( parameter );
 
@@ -132,8 +132,8 @@ public class StartScreen implements Screen {
                 public void clicked( InputEvent event, float x, float y )
                 {
                     //testing the gameOver screen
-                    game.setScreen( new GameOverScreen( game ) );
-                    //Gdx.app.exit();
+                    //game.setScreen( new GameOverScreen( game ,player) );
+                    Gdx.app.exit();
                 }
             } );
 
