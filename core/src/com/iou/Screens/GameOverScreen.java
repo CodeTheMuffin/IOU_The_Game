@@ -75,9 +75,9 @@ public class GameOverScreen implements Screen {
         }
 
         quit = new Label(quitMsg, new Label.LabelStyle(font, Color.BLACK));
-        quit.setPosition(IOU.WIDTH/2-25,IOU.HEIGHT/2-100);
+        quit.setPosition((IOU.WIDTH-quit.getWidth())/2,IOU.HEIGHT/2-100);
         quit.setTouchable(Touchable.enabled);
-        quit.setBounds(IOU.WIDTH/2-25,IOU.HEIGHT/2-100,quit.getWidth(),quit.getHeight());
+        quit.setBounds((IOU.WIDTH-quit.getWidth())/2,IOU.HEIGHT/2-100,quit.getWidth(),quit.getHeight());
         quit.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
