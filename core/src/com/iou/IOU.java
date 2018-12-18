@@ -12,8 +12,8 @@ import com.iou.Screens.StartScreen;
 public class IOU extends Game{
     public SpriteBatch batch;
 
-    public static final int WIDTH = 1000;//800
-    public static final int HEIGHT = 800;//480
+    public static final int WIDTH = 1000;//1000//1600
+    public static final int HEIGHT = 800;//800
     public static final float PIXELS_PER_METER = 100;//32
 
     private static StartScreen main_startScreen;

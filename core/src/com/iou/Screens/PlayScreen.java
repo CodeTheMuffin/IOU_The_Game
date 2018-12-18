@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -59,10 +60,10 @@ public class PlayScreen implements Screen, InputProcessor {
     public int level = 1;
 
 	private HUD hud;
-	
     public Assignments debugAssignment;//TODO: to delete later;
-
     public SpawnManager Spawner;
+
+    private Sound writing_assignment_sound;
 
     public PlayScreen( IOU the_game)
     {
@@ -87,7 +88,6 @@ public class PlayScreen implements Screen, InputProcessor {
 
         if(player == null)
             player = new Player(main_world, game.batch);
-
 
         debugMatrix=new Matrix4(camera.combined);
 
@@ -114,6 +114,9 @@ public class PlayScreen implements Screen, InputProcessor {
         //print("screen width: "+ Gdx.graphics.getWidth()+"\theight: "+ Gdx.graphics.getHeight());
         CreateContactListener();
         IOU.set_PlayScreen( this );
+
+        writing_assignment_sound = Gdx.audio.newSound( Gdx.files.internal( "SFX/writing.mp3" ) );
+
     }
 
     @Override
@@ -361,6 +364,7 @@ public class PlayScreen implements Screen, InputProcessor {
                     else if(isPencil)//if objA or objB is a Pencil object
                     {
                         contactAssignment.get(0).pencil_hit();//increment assignment's grade, if allowed
+                        writing_assignment_sound.play(0.2f);
                         //contactPencil.get(0).set_to_DIE();
 
                         //contactPencil.get(0).destroy();//get rid of pencil

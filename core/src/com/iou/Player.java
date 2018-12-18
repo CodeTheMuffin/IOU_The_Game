@@ -558,8 +558,7 @@ public class Player {//implements InputProcessor {
         if(keycode == Input.Keys.ENTER)
         {
             create_bullet();
-            throwing_sound.play(.25f);
-
+            throwing_sound.play(.2f);
 
             //TODO: DELETE LATER. TESTING SPRITE SETTINGS
             //Sprite dummy = Player_Pencils.get( 0 ).bullet_sprite;
