@@ -95,10 +95,23 @@ public class SpawnManager {
         }
     }
 
-    //draw all the spawns
-    public void draw_spawns(Batch the_batch, World the_world)
+    public void pause_spawns()
     {
-        checkSpawnTimer(the_world);
+        for(Assignments assignments: Assignments_Spawned)
+        {
+            assignments.pauseTimer();
+        }
+
+        //TODO: DO THE SAME FOR E-DRINK
+
+    }
+
+
+    //draw all the spawns
+    public void draw_spawns(Batch the_batch, World the_world, boolean isPaused)
+    {
+        if(!isPaused)
+            checkSpawnTimer(the_world);
 
         for(int i = 0; i< Assignments_Spawned.size(); i++)
         {

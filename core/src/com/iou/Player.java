@@ -3,6 +3,7 @@ package com.iou;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -42,6 +43,8 @@ public class Player {//implements InputProcessor {
     private int eDrinks_collected = 0, eDrinks_allowed = 5;//can only collect up to 5 drinks a level
     private int level= 0;
     private Timer level_timer;
+
+    private Sound throwing_sound;
 
     private ArrayList<Body > BodiesToBeDeleted;
 
@@ -87,6 +90,8 @@ public class Player {//implements InputProcessor {
     {
         setup_sprites();
 
+        throwing_sound = Gdx.audio.newSound( Gdx.files.internal( "SFX/swoosh.mp3" ) );
+
         BodiesToBeDeleted = new ArrayList<Body>();
         //print("Are the world's the same?: "+ main_world + "\t"+getWorld());
 
@@ -119,7 +124,7 @@ public class Player {//implements InputProcessor {
         //specifying the density, restitution(bouncyness), others. for the player
         FixtureDef player_fixtureDef = new FixtureDef();
         player_fixtureDef.shape = shape;
-        player_fixtureDef.density = 0.1f;// JC
+        player_fixtureDef.density = 0.08f;// JC//0.1f
         player_fixtureDef.friction = 1f;//.5f
         player_fixtureDef.restitution = 0f;//.1
 
@@ -553,6 +558,8 @@ public class Player {//implements InputProcessor {
         if(keycode == Input.Keys.ENTER)
         {
             create_bullet();
+            throwing_sound.play(.25f);
+
 
             //TODO: DELETE LATER. TESTING SPRITE SETTINGS
             //Sprite dummy = Player_Pencils.get( 0 ).bullet_sprite;

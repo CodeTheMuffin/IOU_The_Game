@@ -48,7 +48,7 @@ public class PlayScreen implements Screen, InputProcessor {
     static Player player;
     OrthographicCamera camera;
     Wall floor, left_wall, right_wall, ceiling;
-    public boolean isPaused = false;
+    public boolean isPaused = false, justResumed = false;
     public static float global_timer = 10*60;//representing 10 minutes in seconds
 
     //BOX2D DEBUGGING
@@ -171,14 +171,20 @@ public class PlayScreen implements Screen, InputProcessor {
                     debugAssignment = null;
             }*/
 
-
             player.draw_pencils( game.batch );
-            Spawner.draw_spawns( game.batch, main_world );
+            if(!isPaused)
+            {
+                Spawner.draw_spawns( game.batch, main_world , isPaused);
+            }
+            else
+            {
+                Spawner.pause_spawns();
+            }
+
+
 
 
         game.batch.end();
-
-
 
 		game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
 
@@ -187,8 +193,12 @@ public class PlayScreen implements Screen, InputProcessor {
 		/*
 		* Delete bodies
 		* */
-        player.DeleteBodies(main_world);
-        Spawner.DeleteBodies( main_world );
+		if(!isPaused)
+        {
+            player.DeleteBodies(main_world);
+            Spawner.DeleteBodies( main_world );
+        }
+
 
     }
 

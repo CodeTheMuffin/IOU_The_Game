@@ -56,6 +56,9 @@ public class PausePopUp {
         pauseDialog.button(resume);
         pauseDialog.button(mainMenu);
         pauseDialog.show(stage);
+
+        //game.batch.setProjectionMatrix(stage.getCamera().combined);
+
        //spauseDialog.setOrigin( 0,0 );
         //pauseDialog.screenToLocalCoordinates( new Vector2( 0,0 ) );
         //print("Pause Scale X: "+ pauseDialog.getScaleX() +"\tScale y: "+ pauseDialog.getScaleY());

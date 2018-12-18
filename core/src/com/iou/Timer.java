@@ -7,6 +7,7 @@ public class Timer {
     private long StartTime = TimeUtils.nanoTime();
     private long duration = 2; //in nanoseconds
     private final long SECOND_TO_NANO = 1000000000;//1e9
+    private long paused_time = 0;
 
     //d is represented in seconds
     public Timer(float seconds)
@@ -24,6 +25,17 @@ public class Timer {
     public boolean isTimeUp()
     {
         return (TimeUtils.nanoTime() - StartTime  > duration);
+    }
+
+    //Not really pausing, but it's preventing object being removed after resume
+    public void pauseTimer()
+    {
+        if(paused_time == 0)
+        {
+            paused_time=  TimeUtils.nanoTime() - StartTime;
+            duration = paused_time;
+        }
+        StartTime = TimeUtils.nanoTime();
     }
 
     //reset the timer

@@ -61,12 +61,12 @@ public class Assignments extends GAME_OBJECT{
     //timer to be destroyed
     //destroy Assignment after
 
-    Timer test_timer;
+    Timer life_span_timer;
 
     public Assignments(World w)
     {
         pre_setup( w );
-        test_timer= new Timer(5f);//default is 5 seconds
+        life_span_timer= new Timer(5f);//default is 5 seconds
     }
 
     public Assignments(World w, float speed)
@@ -74,7 +74,7 @@ public class Assignments extends GAME_OBJECT{
         if( speed <0 && speed >= -15)
             vx= speed;
         pre_setup( w );
-        test_timer= new Timer(5f);//default is 5 seconds
+        life_span_timer= new Timer(5f);//default is 5 seconds
     }
 
     public Assignments(World w, float speed, float seconds)
@@ -83,9 +83,9 @@ public class Assignments extends GAME_OBJECT{
             vx= speed;
 
         if(seconds > 0f && seconds<= 10f)
-            test_timer= new Timer(seconds);
+            life_span_timer= new Timer(seconds);
         else
-            test_timer= new Timer(5f);//default is 5 seconds
+            life_span_timer= new Timer(5f);//default is 5 seconds
 
         pre_setup( w );
     }
@@ -97,9 +97,9 @@ public class Assignments extends GAME_OBJECT{
         //print("ASS: speed: "+ speed +"\tvx: "+ vx);
 
         if(seconds > 0f && seconds<= 10f)
-            test_timer= new Timer(seconds);
+            life_span_timer= new Timer(seconds);
         else
-            test_timer= new Timer(5f);//default is 5 seconds
+            life_span_timer= new Timer(5f);//default is 5 seconds
 
         if(starting_Y>= MIN_START_Y && starting_Y <= MAX_START_Y)
             startY = starting_Y;
@@ -227,13 +227,18 @@ public class Assignments extends GAME_OBJECT{
 
             check_out_of_bounds();
 
-            if(test_timer.isTimeUp() )
+            if(life_span_timer.isTimeUp() )
             {
                 isReadyToDie = true;//destroy();//print("time is up");
             }
         }
-
     }
+
+    public void pauseTimer()
+    {
+        life_span_timer.pauseTimer();
+    }
+
 
     //just in case something goes bonkers...
     //Pencil and Assignment have same method
