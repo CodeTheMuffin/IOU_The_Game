@@ -32,7 +32,7 @@ public class Assignments extends GAME_OBJECT{
     public static World world;
     public Body assignment_body;
     public Sprite assignment_sprite;//the current sprite
-    public final float assignment_width_px = 32, assignment_height_px =32;//in pixels
+    public final float assignment_width_px = 50, assignment_height_px =50;//in pixels (32)
     public final float assignment_world_width = assignment_width_px/PIXELS_PER_METER;//in meters
     public final float assignment_world_height = assignment_height_px/PIXELS_PER_METER;//in meters
 
@@ -307,12 +307,10 @@ public class Assignments extends GAME_OBJECT{
     //used to simulate a wall hit (if it wasn't hit by the player)
     public void wall_hit()
     {
-        print("\"hit wall\"");
         if(!isAwesome && !isBad)
         {
             if(grade -1 >= 0)
             {
-                print("Decrease grade!");
                 grade--;
                 assignment_sprite = sprite_animations[grade];
             }

@@ -66,17 +66,17 @@ public class HUD implements Disposable {
 
         //DEBT
         Debt = new Label("Debt: ", new Label.LabelStyle(font, Color.BLACK));
-        Debt.setPosition(IOU.WIDTH*.75f, IOU.HEIGHT-45);
+        Debt.setPosition(IOU.WIDTH*.74f, IOU.HEIGHT-45);
 
         debt_amount = new Label("$ "+String.format("%,06d",debtOwed), new Label.LabelStyle(font, Color.BLACK));
         debt_amount.setPosition(Debt.getX()+Debt.getWidth(), Debt.getY());
 
         //GPA
         GPA = new Label("GPA: ", new Label.LabelStyle(font, Color.BLACK));
-        GPA.setPosition(IOU.WIDTH*.75f, IOU.HEIGHT-80);
+        GPA.setPosition(IOU.WIDTH*.74f, IOU.HEIGHT-80);
 
         GPA_amount = new Label(" "+String.format("%.1f",curr_GPA), new Label.LabelStyle(font, Color.BLACK));
-        GPA_amount.setPosition(GPA.getX()+GPA.getWidth(), GPA.getY());
+        GPA_amount.setPosition(GPA.getX()+GPA.getWidth(), GPA.getY()-2);
 
         //gameTitle = new Label("IOU", new Label.LabelStyle(font, Color.BLACK));
         //gameTitle.setPosition(IOU.WIDTH/2-25,IOU.HEIGHT-45);
@@ -119,12 +119,13 @@ public class HUD implements Disposable {
         caffeineMeter.setValue( 5f );
         caffeineMeter.setRound( true );
         */
-        
-        label_boost = new Label( "BOOST", new Label.LabelStyle( font, Color.BLACK ));
-        label_boost.setPosition( 10,IOU.HEIGHT -label_boost.getHeight()-10 );
+
+        label_boost = new Label( "ENERGY", new Label.LabelStyle( font, Color.BLACK ));
+        label_boost.setPosition( 10,IOU.HEIGHT -label_boost.getHeight()-3 );
 
         back_boost_img= new Image(new Texture( Gdx.files.internal( "blue_background_bar.png" ) ));
-        back_boost_img.setPosition( 10, label_boost.getY()-back_boost_img.getHeight() -5 );
+        back_boost_img.setPosition( label_boost.getX() + label_boost.getWidth()+10,
+                label_boost.getY() );
         back_boost_img.setSize( 200,50 );
 
         boost_amount= new Image(new Texture( Gdx.files.internal( "blue_bar.png" ) ));
@@ -132,7 +133,7 @@ public class HUD implements Disposable {
         boost_amount.setSize( 195,42 );// 0%: width of 10,   100%: width of 195
 
         label_level = new Label( "LVL: "+ the_playScreen.level, new Label.LabelStyle( font, Color.BLACK ));
-        label_level.setPosition( 10,back_boost_img.getY()-label_level.getHeight()-5 );
+        label_level.setPosition( 10,label_boost.getY()-label_level.getHeight()-5 );
 
         stage.addActor(Debt);
         stage.addActor(debt_amount);
@@ -167,7 +168,14 @@ public class HUD implements Disposable {
 
     public void updateGPA(int total_grades, int total_collected)
     {
-        curr_GPA = (float)total_grades/(float)total_collected;
+        if(total_collected == 0)
+        {
+            curr_GPA = 0.0f;
+        }
+        else
+        {
+            curr_GPA = (float)total_grades/(float)total_collected;
+        }
 
         GPA_amount.setText(" "+String.format("%.1f",curr_GPA) );
     }

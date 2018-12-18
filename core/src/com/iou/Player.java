@@ -42,7 +42,10 @@ public class Player {//implements InputProcessor {
     private int scholarshipMoney = 0;
     private int eDrinks_collected = 0, eDrinks_allowed = 5;//can only collect up to 5 drinks a level
     private int level= 0;
-    private Timer level_timer;
+
+    private int boost_amount= 0;
+
+    private Timer level_timer, boost_timer;
 
     private Sound throwing_sound;
 
@@ -78,6 +81,8 @@ public class Player {//implements InputProcessor {
 
         //bullet_sprite = new Sprite(new Texture( Gdx.files.internal( "badlogic.jpg" ) ));
         Player_Pencils = new ArrayList<>();
+
+        boost_timer = new Timer(3f);//runs for 3 seconds
 
         //if(batch == null)
           //  batch = the_batch;
@@ -263,6 +268,22 @@ public class Player {//implements InputProcessor {
 
     }
 
+    public int getBoost_amount(){return boost_amount;}
+
+    public void resetBoost()
+    {boost_amount = 0; isInBoostMode = false;}
+
+    public void incrementBoost()
+    {
+        boost_amount +=10;
+        if(boost_amount >=100)
+        {
+            boost_amount =100;
+            isInBoostMode =true;
+            boost_timer.resetTimer();
+        }
+    }
+
     public void isLevelDone()
     {
         if(level_timer.isTimeUp())
@@ -281,6 +302,10 @@ public class Player {//implements InputProcessor {
                // player_body.getPosition().y * PIXELS_PER_METER - (player_sprite.getHeight()/2));
 
        // player_sprite.setPosition( getBody_X(), getBody_Y() );
+
+        if(isInBoostMode)
+            BOOST_MODE();
+
         check_sprite_animation();
         adjust_sprite_position_and_rotation();
 
@@ -290,7 +315,6 @@ public class Player {//implements InputProcessor {
 
         check_out_of_bounds();
 
-
         player_sprite.draw( batch );
         //print("player pos: "+ player_sprite.getWidth()+"\t" +player_sprite.getHeight()+"\n");
     }
@@ -298,8 +322,7 @@ public class Player {//implements InputProcessor {
     //draw pencils if they can
     public void draw_pencils(Batch batch)
     {
-        //print("drawing pencils: "+ Player_Pencils.size());
-        //draw valid pencils, remove unnecessary ones
+        //draw valid pencils, remove unnecessary ones elsewhere
         for(int i= 0;i<Player_Pencils.size(); i++)//for(Pencil pencil: player.Player_Pencils)
         {
             Pencil pencil = Player_Pencils.get( i );
@@ -308,21 +331,26 @@ public class Player {//implements InputProcessor {
                 pencil.draw_me(batch);
             else//if timer is done or if ready to die
             {
-                /* This broke the program
-                    if(pencil.get_pencil_body() != null)//if there is still a body, get rid of it in the world!
-                    {
-                        //pencil.destroy();
-                    }*/
-
                 BodiesToBeDeleted.add( pencil.getBody() );
                 Player_Pencils.remove( i );
                 i--;
 
                 if(Player_Pencils.size() ==0)
                     break;
-                //player.Player_Pencils.remove( pencil );
             }
-            //pencil.get_Pencil_sprite().draw( game.batch );
+        }
+    }
+
+    public void BOOST_MODE()
+    {
+        if(isInBoostMode & !boost_timer.isTimeUp())
+        {
+            player_body.applyAngularImpulse( 1,true );
+            create_bullet();
+        }
+        else
+        {
+            isInBoostMode = false;
         }
     }
 
@@ -376,7 +404,7 @@ public class Player {//implements InputProcessor {
     // called when the user hits one or more keys
     public void movement()
     {
-        if(!allkeysPressed.isEmpty())
+        if(!allkeysPressed.isEmpty() && !isInBoostMode)
         {
             for(int i=0;i<3 && i< allkeysPressed.size(); i++)
             {
@@ -403,13 +431,8 @@ public class Player {//implements InputProcessor {
                     //justChanged =true;
                     isRunning = true;
                 }
-
                 player_body.applyForceToCenter( speed*left_center_right,0,true );
-                //if(keycode == Input.Keys.SPACE)
-                //player_body.setLinearVelocity(0f,200f);
-
             }
-            //print("===============================");
         }
         else
         {
@@ -476,6 +499,8 @@ public class Player {//implements InputProcessor {
     public void assignment_collected()
     {assignments_collected++;}
 
+    public int get_assigment_collected_count(){return assignments_collected;}
+
     public Sprite getSprite()
     {return player_sprite;}
 
@@ -510,15 +535,18 @@ public class Player {//implements InputProcessor {
         if (isPaused) //prevent user from pressing buttons when game is paused
             return false;
 
+        if(isInBoostMode)
+            return false;
+
         //TODO: TO DELETE LATER
         if(keycode == Input.Keys.UP || keycode == Input.Keys.W)
         {
-            player_body.applyAngularImpulse( 1,true );
+            player_body.applyAngularImpulse( 0.8f,true );
         }
 
         if(keycode == Input.Keys.DOWN|| keycode == Input.Keys.S)
         {
-            player_body.applyAngularImpulse( -1,true );
+            player_body.applyAngularImpulse( -0.8f,true );
         }
 
         if(keycode == Input.Keys.SPACE && onGround)
@@ -558,46 +586,14 @@ public class Player {//implements InputProcessor {
         if(keycode == Input.Keys.ENTER)
         {
             create_bullet();
-            throwing_sound.play(.2f);
-
-            //TODO: DELETE LATER. TESTING SPRITE SETTINGS
-            //Sprite dummy = Player_Pencils.get( 0 ).bullet_sprite;
-            //print("Color of Orange: "+ Color.ORANGE);
-            //print("bullet height: "+ dummy.getHeight() +"\twidth: "+ dummy.getWidth()+"\tColor: "+ dummy.getColor());
         }
         return false;
     }
 
     public void create_bullet()
     {
-        /*bullet_bodyDef.position.set( ( player_sprite.getX() + player_sprite.getWidth()+50  ) ,
-                ( player_sprite.getY() + player_sprite.getHeight() / 2 ) );
-
-        Body bullet_body = main_world.createBody( bullet_bodyDef );
-
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox( bullet_sprite.getWidth() /2/ PIXELS_PER_METER, bullet_sprite.getHeight()/2/PIXELS_PER_METER);
-
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        fixtureDef.density = 0.01f;
-        fixtureDef.friction = .1f;
-        fixtureDef.restitution = 0.1f;
-
-        bullet_body.createFixture( fixtureDef );
-
-        Sprite b_sprite= new Sprite(bullet_sprite);//create clone of the sprite
-        b_sprite.setPosition( bullet_body.getPosition().x, bullet_body.getPosition().y );
-        //bullet_body.setLinearVelocity( 50*PIXELS_PER_METER,0 );
-        bullet_body.setGravityScale(0.5f  );
-        //bullet_body.applyForceToCenter( 800f,0f,true );
-        bullet_body.applyLinearImpulse( 10*PIXELS_PER_METER,0,0,0,false );
-        */
-
-        //bullet_bodies.add(new Pencil( bullet_body, batch,this  ));
+        throwing_sound.play(.2f);
         Player_Pencils.add(new Pencil( this  ));
-        //shape.dispose();
-
     }
 
     //used for animations

@@ -7,7 +7,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -29,6 +31,7 @@ import com.iou.IOU;
 import com.iou.Pencil;
 import com.iou.Player;
 import com.iou.SpawnManager;
+import com.iou.Timer;
 import com.iou.Wall;
 import com.iou.HUD.HUD;
 
@@ -50,7 +53,7 @@ public class PlayScreen implements Screen, InputProcessor {
     OrthographicCamera camera;
     Wall floor, left_wall, right_wall, ceiling;
     public boolean isPaused = false, justResumed = false;
-    public static float global_timer = 10*60;//representing 10 minutes in seconds
+    //public static float global_timer = 10*60;//representing 10 minutes in seconds
 
     //BOX2D DEBUGGING
     public final static boolean DEBUG_MODE = true;
@@ -64,6 +67,10 @@ public class PlayScreen implements Screen, InputProcessor {
     public SpawnManager Spawner;
 
     private Sound writing_assignment_sound;
+    private Sprite background_spr;
+
+    public Timer gloabl_timer;
+
 
     public PlayScreen( IOU the_game)
     {
@@ -107,7 +114,7 @@ public class PlayScreen implements Screen, InputProcessor {
         ceiling     = new Wall(player, Wall.wall_position.UP);
 
         //debugAssignment  = new Assignments( main_world );
-        debugAssignment  = new Assignments( main_world , -1,100, GAME_OBJECT.generate_starting_Y());
+        //debugAssignment  = new Assignments( main_world , -1,100, GAME_OBJECT.generate_starting_Y());
 
         Spawner = new SpawnManager( level, game.batch, main_world );
 
@@ -117,6 +124,11 @@ public class PlayScreen implements Screen, InputProcessor {
 
         writing_assignment_sound = Gdx.audio.newSound( Gdx.files.internal( "SFX/writing.mp3" ) );
 
+        background_spr = new Sprite( new Texture( Gdx.files.internal( "Sprites/background.png" ) ) );
+        background_spr.setSize( (IOU.WIDTH)/PIXELS_PER_METER, (IOU.HEIGHT)/PIXELS_PER_METER );
+        background_spr.setPosition( -5,0 );
+
+        gloabl_timer = new Timer(30f);
     }
 
     @Override
@@ -131,6 +143,14 @@ public class PlayScreen implements Screen, InputProcessor {
 
         camera.update();
 
+        //suppose to reset level
+        if(gloabl_timer.isTimeUp())
+        {
+            game.setScreen(new GameOverScreen(game, player));
+        }
+
+
+
         //recommended default values (1/60, 6,2)
         if (!isPaused)//if NOT paused, then simulate physics (via run step/frame)
 		{
@@ -138,6 +158,9 @@ public class PlayScreen implements Screen, InputProcessor {
 			//updating the debt owed by the player
             hud.setDebtOwed(HUD.getDebtOwed()+1);
             hud.updateDebtOwed(HUD.getDebtOwed());
+            hud.updateBoostAmount( player.getBoost_amount());
+            hud.updateGPA( player.total_grade, player.get_assigment_collected_count() );
+            hud.updateTimer( gloabl_timer.getTimeLeft() );
 		}
 
         //draws things in the same way as debug and self scales
@@ -155,8 +178,10 @@ public class PlayScreen implements Screen, InputProcessor {
         //include player control movements
         player.movement();
 
+
         stage.draw();
         game.batch.begin();
+            background_spr.draw( game.batch );
             //floor.draw_me(game.batch);
             //left_wall.draw_me(game.batch);
             //ceiling.draw_me(game.batch);
@@ -446,10 +471,11 @@ public class PlayScreen implements Screen, InputProcessor {
                     camera.position.y += cam_speed;
                     break;
                 }
+
                 //to get to gameOverScreen
                 case Input.Keys.Q:{
                     game.setScreen(new GameOverScreen(game, player));
-                    System.out.println(player.total_grade);
+                    //System.out.println(player.total_grade);
                     break;
                 }
                 case Input.Keys.NUMPAD_2:{

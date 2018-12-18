@@ -38,6 +38,18 @@ public class Timer {
         StartTime = TimeUtils.nanoTime();
     }
 
+    public float getTimeLeft()
+    {
+        long diff = TimeUtils.nanoTime() - StartTime;
+
+        if(diff > duration)
+        {
+            return 0f;
+        }
+
+        return (float)(duration-diff)/SECOND_TO_NANO;
+    }
+
     //reset the timer
     public void resetTimer()
     {
