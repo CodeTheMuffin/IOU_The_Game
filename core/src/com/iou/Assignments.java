@@ -185,7 +185,6 @@ public class Assignments extends GAME_OBJECT{
         }
 
         // Creating the Assignment BODY PROCESS
-
         BodyDef assignment_body_def = new BodyDef();
         assignment_body_def.type = BodyDef.BodyType.KinematicBody;
 

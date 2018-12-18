@@ -32,8 +32,8 @@ public class HUD implements Disposable {
 
     private Viewport hudViewport;
     private PlayScreen the_playScreen;
-    private static Integer debtOwed = 10000;
-    private Float curr_GPA = 3.5f;
+    private static Integer debtOwed = 10000;//starting at 10k
+    private Float curr_GPA = 3.5f;//just for giggles
 
     public Label Debt, GPA;
     public static Label debt_amount, GPA_amount, timer_amount;

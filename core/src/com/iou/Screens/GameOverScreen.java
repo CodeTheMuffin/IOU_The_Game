@@ -32,10 +32,12 @@ public class GameOverScreen implements Screen {
     Label quit;
     Label scholarshipEarned;
     private Texture background;
+    private boolean readyToQuit =false;
 
-    public GameOverScreen(IOU game, Player player){
+    public GameOverScreen(IOU game, Player player, boolean quitME){
         this.game = game;
         this.player = player;
+        readyToQuit = quitME;
         viewport = new FitViewport(IOU.WIDTH, IOU.HEIGHT, new OrthographicCamera());
         stage= new Stage(viewport, game.batch);
         Gdx.input.setInputProcessor(stage);
@@ -51,6 +53,7 @@ public class GameOverScreen implements Screen {
         parameter.size = 30;
         final BitmapFont font = generator.generateFont(parameter);
 
+
         returnMain = new Label("Return to Main Menu", new Label.LabelStyle(font, Color.BLACK));
         returnMain.setPosition(IOU.WIDTH/2-100,IOU.HEIGHT/2-50);
         returnMain.setTouchable(Touchable.enabled);
@@ -64,21 +67,39 @@ public class GameOverScreen implements Screen {
             }
         });
 
-        quit = new Label("Quit", new Label.LabelStyle(font, Color.BLACK));
+        String quitMsg = "Quit";
+
+        if(!readyToQuit)
+        {
+            quitMsg="Resume to next Level.";
+        }
+
+        quit = new Label(quitMsg, new Label.LabelStyle(font, Color.BLACK));
         quit.setPosition(IOU.WIDTH/2-25,IOU.HEIGHT/2-100);
         quit.setTouchable(Touchable.enabled);
         quit.setBounds(IOU.WIDTH/2-25,IOU.HEIGHT/2-100,quit.getWidth(),quit.getHeight());
         quit.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
-                Gdx.app.exit();
+                if(readyToQuit)
+                    Gdx.app.exit();
+                else
+                    game.setScreen( IOU.get_PlayScreen( game ) );
             }
         });
 
-        gameOver = new Label("Game Over", new Label.LabelStyle(font,Color.BLACK));
-        gameOver.setPosition(IOU.WIDTH/2-50, IOU.HEIGHT/2+100);
+        if(readyToQuit)
+        {
+            gameOver = new Label("Game Over", new Label.LabelStyle(font,Color.BLACK));
+            gameOver.setPosition(IOU.WIDTH/2-50, IOU.HEIGHT/2+100);
+            stage.addActor(gameOver);
+        }
 
-        finalScore = new Label("Final Debt amount is: $"+(finalDebt-player.getScholarshipMoney()), new Label.LabelStyle(font, Color.BLACK));
+        Integer total_debt = (int)finalDebt - player.getScholarshipMoney();
+
+        finalScore = new Label("Total Debt amount is $ "+
+                String.format("%,06d", total_debt),
+                new Label.LabelStyle(font, Color.BLACK));
         finalScore.setPosition(IOU.WIDTH/2-100, IOU.HEIGHT/2+50);
 
         scholarshipEarned = new Label("Scholarship: $"+player.getScholarshipMoney(), new Label.LabelStyle(font, Color.BLACK));
@@ -86,7 +107,7 @@ public class GameOverScreen implements Screen {
 
         stage.addActor(returnMain);
         stage.addActor(quit);
-        stage.addActor(gameOver);
+
         stage.addActor(finalScore);
         stage.addActor(scholarshipEarned);
 

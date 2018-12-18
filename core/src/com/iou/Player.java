@@ -24,6 +24,7 @@ import static com.iou.IOU.print;
 public class Player {//implements InputProcessor {
     public World main_world;//TODO: get rid of public for main_world
     Body player_body;
+    public static int totalDebtOwed = 10000;// starting at 10K
 
     // speed and jump_force are being used with applyLinearImpulse, so they are both velocities, in m/s.
     float speed = 4f;//5
@@ -45,7 +46,7 @@ public class Player {//implements InputProcessor {
 
     private int boost_amount= 0;
 
-    private Timer level_timer, boost_timer;
+    private Timer boost_timer;
 
     private Sound throwing_sound;
 
@@ -82,7 +83,7 @@ public class Player {//implements InputProcessor {
         //bullet_sprite = new Sprite(new Texture( Gdx.files.internal( "badlogic.jpg" ) ));
         Player_Pencils = new ArrayList<>();
 
-        boost_timer = new Timer(3f);//runs for 3 seconds
+        boost_timer = new Timer(1f);//runs for 3 seconds
 
         //if(batch == null)
           //  batch = the_batch;
@@ -194,7 +195,8 @@ public class Player {//implements InputProcessor {
         level = lvl;
         reset_assignments_collected();
         reset_eDrinks_collected();
-        float seconds= 10f;
+
+        /*float seconds= 10f;
 
         //the levels are the years
         if(level == 1)
@@ -224,9 +226,9 @@ public class Player {//implements InputProcessor {
             assignments_needed = 12;
             assignments_allowed = 15;
             seconds = 40f;
-        }
+        }*/
 
-        level_timer = new Timer(seconds);
+        //level_timer = new Timer(seconds);
     }
 
     public void check_sprite_animation()
@@ -275,15 +277,19 @@ public class Player {//implements InputProcessor {
 
     public void incrementBoost()
     {
-        boost_amount +=10;
-        if(boost_amount >=100)
+        if(!isInBoostMode)
         {
-            boost_amount =100;
-            isInBoostMode =true;
-            boost_timer.resetTimer();
+            boost_amount +=10;
+            if(boost_amount >=100)
+            {
+                boost_amount =100;
+                isInBoostMode =true;
+                boost_timer.resetTimer();
+            }
         }
     }
 
+    /*
     public void isLevelDone()
     {
         if(level_timer.isTimeUp())
@@ -292,7 +298,7 @@ public class Player {//implements InputProcessor {
             //reset spawner (in PlayScreen), reset level.
         }
 
-    }
+    }*/
 
     //assuming that the batch has begun and ended before calling this method
     public void draw_me( Batch batch)
@@ -308,7 +314,6 @@ public class Player {//implements InputProcessor {
 
         check_sprite_animation();
         adjust_sprite_position_and_rotation();
-
 
         //player_sprite.setPosition( player_body.getPosition().x * PIXELS_PER_METER*2,
                 //player_body.getPosition().y * PIXELS_PER_METER*2);
@@ -343,14 +348,20 @@ public class Player {//implements InputProcessor {
 
     public void BOOST_MODE()
     {
-        if(isInBoostMode & !boost_timer.isTimeUp())
+        boost_amount -= boost_timer.getTimeLeft()/60;// divide by 60 for the frames
+
+        //to prevent the GUI from being funky
+        if(boost_amount <0)
+            boost_amount = 0;
+
+        if(!boost_timer.isTimeUp())
         {
-            player_body.applyAngularImpulse( 1,true );
+            player_body.applyAngularImpulse( 0.8f,true );
             create_bullet();
         }
         else
         {
-            isInBoostMode = false;
+            resetBoost();
         }
     }
 
@@ -392,12 +403,31 @@ public class Player {//implements InputProcessor {
 
     }
 
-    void relocate()
+    public void relocate()
     {
         //resets the player's position and speed
         player_body.setTransform( ORGINAL_X, ORGINAL_Y,0 );
         player_body.setLinearVelocity( 0,0 );
         player_body.setAngularVelocity( 0 );
+    }
+
+    //only to be called for the next level
+    public void nextLevel()
+    {
+        setup_level( level++ );
+        scholarshipMoney = 0;
+        assignments_collected = 0;
+        total_grade= 0;
+
+        for(Pencil pencil: Player_Pencils)
+        {
+            if(!BodiesToBeDeleted.contains( pencil.getBody() ))
+            {
+                pencil.set_to_DIE();
+                //Player_Pencils.remove( pencil );
+            }
+        }
+        Player_Pencils.clear();
     }
 
     // should be called in a render method
@@ -525,7 +555,7 @@ public class Player {//implements InputProcessor {
         if(Player_Pencils.contains( pen ))
         {
             Player_Pencils.remove( pen );
-            main_world.destroyBody( pen.getBody() );
+           //main_world.destroyBody( pen.getBody() );
         }
     }
 
@@ -634,8 +664,6 @@ public class Player {//implements InputProcessor {
         //print("\tAfter: jumping: "+ jumping +"\tOnGround: "+ onGround);
         return true;
     }
-
-
 
 
     //@Override

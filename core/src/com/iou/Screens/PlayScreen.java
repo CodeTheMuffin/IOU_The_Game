@@ -69,7 +69,8 @@ public class PlayScreen implements Screen, InputProcessor {
     private Sound writing_assignment_sound;
     private Sprite background_spr;
 
-    public Timer gloabl_timer;
+    public Timer global_timer;
+    public boolean just_leveled_up= false;
 
 
     public PlayScreen( IOU the_game)
@@ -128,7 +129,7 @@ public class PlayScreen implements Screen, InputProcessor {
         background_spr.setSize( (IOU.WIDTH)/PIXELS_PER_METER, (IOU.HEIGHT)/PIXELS_PER_METER );
         background_spr.setPosition( -5,0 );
 
-        gloabl_timer = new Timer(30f);
+        global_timer = new Timer(30f);
     }
 
     @Override
@@ -144,9 +145,26 @@ public class PlayScreen implements Screen, InputProcessor {
         camera.update();
 
         //suppose to reset level
-        if(gloabl_timer.isTimeUp())
+        if(global_timer.isTimeUp())
         {
-            game.setScreen(new GameOverScreen(game, player));
+            level ++;
+
+            if(level<5)
+            {
+                global_timer.resetTimer();
+                //global_timer.pauseTimer();
+                Spawner.nextLevel();
+                player.relocate();
+                player.nextLevel();
+                //TODO: play sound
+                print("CALLING ME?");
+                game.setScreen(new GameOverScreen(game, player, false  ));
+            }
+            else
+            {
+                game.setScreen(new GameOverScreen(game, player, true));
+            }
+            //game.setScreen(new GameOverScreen(game, player));
         }
 
 
@@ -160,7 +178,8 @@ public class PlayScreen implements Screen, InputProcessor {
             hud.updateDebtOwed(HUD.getDebtOwed());
             hud.updateBoostAmount( player.getBoost_amount());
             hud.updateGPA( player.total_grade, player.get_assigment_collected_count() );
-            hud.updateTimer( gloabl_timer.getTimeLeft() );
+            hud.updateTimer( global_timer.getTimeLeft() );
+            hud.update_lvl_label();
 		}
 
         //draws things in the same way as debug and self scales
@@ -365,7 +384,8 @@ public class PlayScreen implements Screen, InputProcessor {
                     }
                     else if(isEDrink)//if objA or objB is an Energy_Drink object
                     {
-
+                        player.incrementBoost();
+                        contactE_Dirnk.get( 0 ).player_hit();
                     }
                 }
                 else if(isAssignment)//if objA or objB is an Assignments object
@@ -474,7 +494,7 @@ public class PlayScreen implements Screen, InputProcessor {
 
                 //to get to gameOverScreen
                 case Input.Keys.Q:{
-                    game.setScreen(new GameOverScreen(game, player));
+                    game.setScreen(new GameOverScreen(game, player, true));
                     //System.out.println(player.total_grade);
                     break;
                 }
