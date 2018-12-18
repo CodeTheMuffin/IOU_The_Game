@@ -428,6 +428,8 @@ public class Player {//implements InputProcessor {
             }
         }
         Player_Pencils.clear();
+        allkeysPressed.clear();
+        keypressed =false;
     }
 
     // should be called in a render method

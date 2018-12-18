@@ -24,7 +24,7 @@ public class GameOverScreen implements Screen {
     private static Player player;
     private HUD hud;
     private final Viewport viewport;
-    private double finalDebt = hud.getDebtOwed();
+    private int finalDebt = Player.totalDebtOwed;//hud.getDebtOwed();
     private Stage stage;
     Label gameOver;
     Label finalScore;
@@ -95,7 +95,7 @@ public class GameOverScreen implements Screen {
             stage.addActor(gameOver);
         }
 
-        Integer total_debt = (int)finalDebt - player.getScholarshipMoney();
+        Integer total_debt = player.totalDebtOwed - player.getScholarshipMoney();
 
         finalScore = new Label("Total Debt amount is $ "+
                 String.format("%,06d", total_debt),

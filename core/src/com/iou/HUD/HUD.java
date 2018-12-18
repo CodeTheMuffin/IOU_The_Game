@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.iou.IOU;
+import com.iou.Player;
 import com.iou.Screens.PlayScreen;
 
 
@@ -132,7 +133,7 @@ public class HUD implements Disposable {
         boost_amount.setPosition( back_boost_img.getX()+1, back_boost_img.getY()+5 );
         boost_amount.setSize( 195,42 );// 0%: width of 10,   100%: width of 195
 
-        label_level = new Label( "LVL: "+ the_playScreen.level, new Label.LabelStyle( font, Color.BLACK ));
+        label_level = new Label( "Year: "+ the_playScreen.level, new Label.LabelStyle( font, Color.BLACK ));
         label_level.setPosition( 10,label_boost.getY()-label_level.getHeight()-5 );
 
         stage.addActor(Debt);
@@ -155,15 +156,17 @@ public class HUD implements Disposable {
 
         //stage.addActor( test_slider );
     }
-
+    /*
     public static Integer getDebtOwed(){
         return debtOwed;
     }
     public static void setDebtOwed(int newDebtOwed){
         HUD.debtOwed = newDebtOwed;
     }
-    public static void updateDebtOwed(int newDebtOwned){
-        debt_amount.setText("$ "+String.format("%,06d", newDebtOwned));
+    */
+
+    public static void updateDebtOwed(){
+        debt_amount.setText("$ "+String.format("%,06d", Player.totalDebtOwed));
     }
 
     public void updateGPA(int total_grades, int total_collected)
@@ -211,7 +214,7 @@ public class HUD implements Disposable {
 
     public void update_lvl_label()
     {
-        label_level.setText( "LVL: "+the_playScreen.level);
+        label_level.setText( "Year: "+the_playScreen.level);
     }
 
     @Override

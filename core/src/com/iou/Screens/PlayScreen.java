@@ -157,7 +157,8 @@ public class PlayScreen implements Screen, InputProcessor {
                 player.relocate();
                 player.nextLevel();
                 //TODO: play sound
-                print("CALLING ME?");
+                player.DeleteBodies(main_world);
+                Spawner.DeleteBodies( main_world );
                 game.setScreen(new GameOverScreen(game, player, false  ));
             }
             else
@@ -174,8 +175,10 @@ public class PlayScreen implements Screen, InputProcessor {
 		{
 			main_world.step(1f/60f, 6, 2);
 			//updating the debt owed by the player
-            hud.setDebtOwed(HUD.getDebtOwed()+1);
-            hud.updateDebtOwed(HUD.getDebtOwed());
+            //hud.setDebtOwed(HUD.getDebtOwed()+1);
+            //hud.updateDebtOwed(HUD.getDebtOwed());
+            player.totalDebtOwed++;
+            hud.updateDebtOwed();
             hud.updateBoostAmount( player.getBoost_amount());
             hud.updateGPA( player.total_grade, player.get_assigment_collected_count() );
             hud.updateTimer( global_timer.getTimeLeft() );
