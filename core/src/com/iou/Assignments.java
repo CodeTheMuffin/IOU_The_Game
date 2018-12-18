@@ -137,27 +137,27 @@ public class Assignments extends GAME_OBJECT{
         if(getArraySize( sprite_animations ) == 0)
         {
             //sprite_animations = new Sprite[5];
-            String path = "";//"/Sprites/Assignments/";
-            sprite_animations[0] = new Sprite(new Texture( Gdx.files.internal( path+"badlogic.jpg" ) ));//F
-            sprite_animations[0].setColor( Color.BLACK );//F for testing
+            String path = "Sprites/Assignments/";
+            sprite_animations[0] = new Sprite(new Texture( Gdx.files.internal( path+"F_paper.png" ) ));//F
+            //sprite_animations[0].setColor( Color.BLACK );//F for testing
 
-            sprite_animations[1] = new Sprite(new Texture( Gdx.files.internal( path+"badlogic.jpg"  ) ));//D
-            sprite_animations[1].setColor( Color.FIREBRICK );//D
+            sprite_animations[1] = new Sprite(new Texture( Gdx.files.internal( path+"D_paper.png"  ) ));//D
+            //sprite_animations[1].setColor( Color.FIREBRICK );//D
 
-            sprite_animations[2] = new Sprite(new Texture( Gdx.files.internal( path+"badlogic.jpg"  ) ));//C
-            sprite_animations[2].setColor( Color.PINK );//D
+            sprite_animations[2] = new Sprite(new Texture( Gdx.files.internal( path+"C_paper.png"  ) ));//C
+            //sprite_animations[2].setColor( Color.PINK );//D
 
-            sprite_animations[3] = new Sprite(new Texture( Gdx.files.internal( path+"badlogic.jpg"  ) ));//B
-            sprite_animations[3].setColor( Color.BLUE );//D
+            sprite_animations[3] = new Sprite(new Texture( Gdx.files.internal( path+"B_paper.png"  ) ));//B
+            //sprite_animations[3].setColor( Color.BLUE );//D
 
-            sprite_animations[4] = new Sprite(new Texture( Gdx.files.internal( path+"badlogic.jpg"  ) ));//A
-            sprite_animations[4].setColor( Color.WHITE );//D
+            sprite_animations[4] = new Sprite(new Texture( Gdx.files.internal( path+"A_paper.png"  ) ));//A
+            //sprite_animations[4].setColor( Color.WHITE );//D
 
-            sprite_animations[5] = new Sprite(new Texture( Gdx.files.internal( path+"badlogic.jpg"  ) ));//BAD
-            sprite_animations[5].setColor( Color.RED );//D
+            sprite_animations[5] = new Sprite(new Texture( Gdx.files.internal( path+"_BAD_PAPER.png"  ) ));//BAD
+            //sprite_animations[5].setColor( Color.RED );//D
 
-            sprite_animations[6] = new Sprite(new Texture( Gdx.files.internal( path+"badlogic.jpg"  ) ));//AWESOME
-            sprite_animations[6].setColor( Color.GREEN );//D
+            sprite_animations[6] = new Sprite(new Texture( Gdx.files.internal( path+"_GOOD_PAPER.png"  ) ));//AWESOME
+            //sprite_animations[6].setColor( Color.GREEN );//D
 
             //resize all of them
             for(int i=0; i< sprite_animations.length;i++)

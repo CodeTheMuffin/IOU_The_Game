@@ -18,11 +18,11 @@ import static com.iou.IOU.print;
 public class Pencil {
     Body bullet_body;
     Sprite bullet_sprite;
-    final static Texture bullet_txt= new Texture( Gdx.files.internal("badlogic.jpg"));
+    final static Texture bullet_txt= new Texture( Gdx.files.internal("Sprites/pencil.png"));
     //static Batch batch;
     static Player player;
     BodyDef bullet_bodyDef;
-    final float bullet_width_px = 20f, bullet_height_px = 10f; //in pixels
+    final float bullet_width_px = 40f, bullet_height_px = 20f; //in pixels
     final float bullet_world_width = bullet_width_px/PIXELS_PER_METER;//in meters
     final float bullet_world_height = bullet_height_px/PIXELS_PER_METER;//in meters
     private Timer pencil_timer;
@@ -48,7 +48,7 @@ public class Pencil {
     {
         bullet_sprite = new Sprite(bullet_txt);
         bullet_sprite.setSize( bullet_width_px,bullet_height_px );
-        bullet_sprite.setColor( Color.ORANGE );
+        //bullet_sprite.setColor( Color.ORANGE );
 
         //print("\tbullet height: "+ bullet_sprite.getHeight() +"\twidth: "+ bullet_sprite.getWidth()+"\tColor: "+
               //  bullet_sprite.getColor());
