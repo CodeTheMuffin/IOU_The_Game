@@ -332,10 +332,15 @@ public class PlayScreen implements Screen, InputProcessor {
                 }
                 else if(isAssignment)//if objA or objB is an Assignments object
                 {
+                    //NOTE:
+                    //this won't work because the wall is static and the assignment is kinematic
+                    //collision checks are only for dynamic and either static or kinematic.
                     if(isWall)//if objA or objB is a Wall object
                     {
                         //if the wall is in the LEFT position
                         //Assume that there will be at least one Wall object in the array list.
+                        //print("wall contact: "+ contactWall.get(0).curr_wall_position);
+
                         if(contactWall.get(0).curr_wall_position == Wall.wall_position.LEFT)
                         {
                             //TODO: Take some points off for 'lateness' and apply grading

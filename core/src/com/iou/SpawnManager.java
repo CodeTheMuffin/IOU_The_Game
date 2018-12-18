@@ -13,6 +13,7 @@ import java.util.Random;
 //import static com.iou.Assignments.world;
 import static com.iou.GAME_OBJECT.generate_speed;
 import static com.iou.GAME_OBJECT.generate_starting_Y;
+import static com.iou.GameScreen.print;
 
 
 public class SpawnManager {
@@ -86,9 +87,10 @@ public class SpawnManager {
         if(spawn_timer.isTimeUp())
         {
             float the_starting_Y = generate_starting_Y();
+            float the_starting_speed = generate_speed();
 
             //Assignments_Spawned.add(new Assignments(world));
-            Assignments_Spawned.add(new Assignments(world, -3f, 5f, the_starting_Y));
+            Assignments_Spawned.add(new Assignments(world, the_starting_speed, 4f, the_starting_Y));
             spawn_timer.resetTimer();
         }
     }
@@ -106,10 +108,16 @@ public class SpawnManager {
                 assignment.draw_me(the_batch);
             else//if timer is done or if ready to die
             {
-                if(assignment.getBody() != null)//if there is still a body, get rid of it in the world!
-                {
+                //if(assignment.getBody() != null)//if there is still a body, get rid of it in the world!
+                //{
                     //assignment.destroy();
                     //assignment.destroy(world);//this
+                //}
+
+                if(!assignment.player_hit_me)//if its time to die, and player did not hit me
+                {
+                    //simulate hitting a wall
+                    assignment.wall_hit();
                 }
 
                 BodiesToBeDeleted.add( assignment.getBody() );

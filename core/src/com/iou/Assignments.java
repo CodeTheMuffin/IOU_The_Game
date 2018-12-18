@@ -56,6 +56,7 @@ public class Assignments extends GAME_OBJECT{
     // into them!
     public int good_chance =50; //used for generating the chance of getting an awesome assignment.
     public boolean isReadyToDie= false;
+    public boolean player_hit_me =false;
 
     //timer to be destroyed
     //destroy Assignment after
@@ -93,7 +94,7 @@ public class Assignments extends GAME_OBJECT{
     {
         if( speed <0f && speed >= -15f)
             vx= speed;
-        print("ASS: speed: "+ speed +"\tvx: "+ vx);
+        //print("ASS: speed: "+ speed +"\tvx: "+ vx);
 
         if(seconds > 0f && seconds<= 10f)
             test_timer= new Timer(seconds);
@@ -103,7 +104,7 @@ public class Assignments extends GAME_OBJECT{
         if(starting_Y>= MIN_START_Y && starting_Y <= MAX_START_Y)
             startY = starting_Y;
 
-        print("\tthe starting Y: "+ starting_Y);
+        //print("\tthe starting Y: "+ starting_Y);
 
         pre_setup( w );
     }
@@ -297,17 +298,21 @@ public class Assignments extends GAME_OBJECT{
     }
 
     //called when assignment hit the left wall (will be coded that way in PlayScreen)
+    //this won't work b/c wall is static and assignment is kinematic (not collision checks)
+    //used to simulate a wall hit (if it wasn't hit by the player)
     public void wall_hit()
     {
+        print("\"hit wall\"");
         if(!isAwesome && !isBad)
         {
             if(grade -1 >= 0)
             {
+                print("Decrease grade!");
                 grade--;
                 assignment_sprite = sprite_animations[grade];
-                isReadyToDie = true;
             }
         }
+        isReadyToDie = true;
     }
 
     //called when the player hit the assignment
@@ -316,11 +321,10 @@ public class Assignments extends GAME_OBJECT{
         //if(!isAwesome && !isBad)
         {
             isReadyToDie = true;
+            player_hit_me= true;
             //print("Assignment collected!");
         }
     }
-
-
 
     public Body getBody()
     { return assignment_body;}

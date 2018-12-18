@@ -34,8 +34,6 @@ public class StartScreen implements Screen {
     Sprite img_delte_me;
     OrthographicCamera camera;
 
-
-
     public StartScreen(IOU the_game)
     {
         game= the_game;

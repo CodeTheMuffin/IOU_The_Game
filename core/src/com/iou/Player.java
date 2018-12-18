@@ -23,7 +23,7 @@ import static com.iou.IOU.print;
 public class Player {//implements InputProcessor {
     public World main_world;//TODO: get rid of public for main_world
     Body player_body;
-    final Sprite player_sprite;//, bullet_sprite;
+
     // speed and jump_force are being used with applyLinearImpulse, so they are both velocities, in m/s.
     float speed = 4f;//5
     float jump_force = 2f;//2.5
@@ -48,13 +48,30 @@ public class Player {//implements InputProcessor {
     //FOR THE PENCILS being thrown
     public ArrayList< Pencil > Player_Pencils;
 
+    //use these as oppose to animations to simplify code
+    //yes its more memory expensive, but due to lack of time....
+    private Sprite[] player_idle_sprites = new Sprite[3];
+    private Sprite[] player_boost_sprites = new Sprite[3];
+    private Sprite[] player_run_sprites = new Sprite[3];
+    private Sprite player_jump_sprite;
 
+    private Sprite player_sprite;//current sprite
 
+    //used for the sprites
+    private boolean isRunning =false;
+    private boolean isInBoostMode =false;
+    private boolean justChanged = false;
+    private boolean justPressed = false;
+    private int animate_index= 0;// 0,1,2 values only
+
+    private final float SPRITE_SIZE = 108f/PIXELS_PER_METER;
+
+    private Timer animation_timer;
 
     public Player(World world, Batch the_batch)
     {
         main_world= world;
-        player_sprite = new Sprite(new Texture( Gdx.files.internal( "badlogic.jpg" ) ));
+        //player_sprite = new Sprite(new Texture( Gdx.files.internal( "badlogic.jpg" ) ));
 
         //bullet_sprite = new Sprite(new Texture( Gdx.files.internal( "badlogic.jpg" ) ));
         Player_Pencils = new ArrayList<>();
@@ -68,7 +85,8 @@ public class Player {//implements InputProcessor {
     //setup the pencil's box2D properties
     public void setup()
     {
-        player_sprite.setColor( Color.BLUE );
+        setup_sprites();
+
         BodiesToBeDeleted = new ArrayList<Body>();
         //print("Are the world's the same?: "+ main_world + "\t"+getWorld());
 
@@ -98,11 +116,6 @@ public class Player {//implements InputProcessor {
 
         shape.setAsBox( player_world_width/2, player_world_height/2 );//20,40
 
-        player_sprite.setSize( player_world_width,player_world_height );
-        //able to link sprite with body's scaling and rotations (even if they aren't being used in-game)
-        //  really for 'just-in-case' a bug occurs, it won't look janky.
-        player_sprite.setOrigin( player_sprite.getWidth()/2, player_sprite.getHeight()/2 );
-
         //specifying the density, restitution(bouncyness), others. for the player
         FixtureDef player_fixtureDef = new FixtureDef();
         player_fixtureDef.shape = shape;
@@ -115,6 +128,55 @@ public class Player {//implements InputProcessor {
         relocate();
 
         shape.dispose();
+    }
+
+    private void setup_sprites()
+    {
+        for(int i=0; i< player_idle_sprites.length; i++)
+        {
+            player_idle_sprites[i] = new Sprite( new Texture(
+                    Gdx.files.internal( "Sprites/Player/idle_"+(i+1)+".png") ) );
+            //player_idle_sprites[i].setSize( SPRITE_SIZE, SPRITE_SIZE );
+            player_idle_sprites[i].setSize( player_world_width,player_world_height );
+            player_idle_sprites[i].setOrigin( player_idle_sprites[i].getWidth()/2,
+                    player_idle_sprites[i].getHeight()/2 );
+        }
+
+        for(int i=0; i< player_boost_sprites.length; i++)
+        {
+            player_boost_sprites[i] = new Sprite( new Texture(
+                    Gdx.files.internal( "Sprites/Player/boost_"+(i+1)+".png") ) );
+            //player_boost_sprites[i].setSize( SPRITE_SIZE, SPRITE_SIZE );
+            player_boost_sprites[i].setSize( player_world_width,player_world_height );
+            player_boost_sprites[i].setOrigin( player_boost_sprites[i].getWidth()/2,
+                    player_boost_sprites[i].getHeight()/2 );
+        }
+
+        for(int i=0; i< player_run_sprites.length; i++)
+        {
+            player_run_sprites[i] = new Sprite( new Texture(
+                    Gdx.files.internal( "Sprites/Player/run_"+(i+1)+".png") ) );
+            //player_run_sprites[i].setSize( SPRITE_SIZE, SPRITE_SIZE );
+            player_run_sprites[i].setSize( player_world_width,player_world_height );
+            player_run_sprites[i].setOrigin( player_run_sprites[i].getWidth()/2,
+                    player_run_sprites[i].getHeight()/2 );
+        }
+
+        player_jump_sprite= new Sprite(new Texture( Gdx.files.internal( "Sprites/Player/jump.png" ) ));
+        //player_jump_sprite.setSize( SPRITE_SIZE, SPRITE_SIZE );
+        player_jump_sprite.setSize( player_world_width,player_world_height );
+        player_jump_sprite.setOrigin( player_jump_sprite.getWidth()/2,
+                player_jump_sprite.getHeight()/2 );
+
+        player_sprite = player_idle_sprites[0];
+        player_sprite.setSize( player_world_width,player_world_height );//this
+        //player_sprite.setSize( SPRITE_SIZE, SPRITE_SIZE);
+
+        //able to link sprite with body's scaling and rotations (even if they aren't being used in-game)
+        //  really for 'just-in-case' a bug occurs, it won't look janky.
+        player_sprite.setOrigin( player_sprite.getWidth()/2, player_sprite.getHeight()/2 );
+
+        animation_timer = new Timer(.2f);//.2f
     }
 
     public void setup_level(int lvl)
@@ -157,6 +219,45 @@ public class Player {//implements InputProcessor {
         level_timer = new Timer(seconds);
     }
 
+    public void check_sprite_animation()
+    {
+        if(justChanged)
+        {
+            animate_index = 0;
+            justChanged =false;
+        }
+
+        if(!isInBoostMode)
+        {
+            if(onGround)
+            {
+                if(isRunning)
+                {
+                    player_sprite = player_run_sprites[animate_index];
+                }
+                else//then idle
+                {
+                    player_sprite = player_idle_sprites[animate_index];
+                }
+            }
+            else if(jumping)
+            {
+                player_sprite = player_jump_sprite;
+            }
+        }
+        else//in boost mode
+        {
+            player_sprite = player_boost_sprites[animate_index];
+        }
+
+        if(animation_timer.isTimeUp())
+        {
+            animate_index = (animate_index+1)%3;
+            animation_timer.resetTimer();
+        }
+
+    }
+
     public void isLevelDone()
     {
         if(level_timer.isTimeUp())
@@ -175,6 +276,7 @@ public class Player {//implements InputProcessor {
                // player_body.getPosition().y * PIXELS_PER_METER - (player_sprite.getHeight()/2));
 
        // player_sprite.setPosition( getBody_X(), getBody_Y() );
+        check_sprite_animation();
         adjust_sprite_position_and_rotation();
 
 
@@ -182,6 +284,7 @@ public class Player {//implements InputProcessor {
                 //player_body.getPosition().y * PIXELS_PER_METER*2);
 
         check_out_of_bounds();
+
 
         player_sprite.draw( batch );
         //print("player pos: "+ player_sprite.getWidth()+"\t" +player_sprite.getHeight()+"\n");
@@ -221,8 +324,10 @@ public class Player {//implements InputProcessor {
     //to be called in the draw_me(). really only for rendering purposes
     private void adjust_sprite_position_and_rotation()
     {
-        player_sprite.setPosition( getBody_X() - player_sprite.getWidth()/2,
-                getBody_Y() - player_sprite.getHeight()/2 );
+        float new_x = getBody_X() - player_sprite.getWidth()/2;
+        float new_y = getBody_Y() - player_sprite.getHeight()/2-.1f;
+
+        player_sprite.setPosition(new_x, new_y);
 
         player_sprite.setRotation( player_body.getAngle() * MathUtils.radiansToDegrees );
         //player_sprite.rotate( player_body.getAngle() );
@@ -281,12 +386,17 @@ public class Player {//implements InputProcessor {
 
                     //player_body.applyLinearImpulse( new Vector2( 0,550 ), player_body.getPosition(),true );
                     left_center_right = 1;
+                    reset_stats();//unnecessary but more for understanding purposes
+                    //justChanged =true;
+                    isRunning = true;
                 }
-
-                if(keycode == Input.Keys.LEFT|| keycode == Input.Keys.A)
+                else if(keycode == Input.Keys.LEFT|| keycode == Input.Keys.A)
                 {
                     //this works: player_body.setLinearVelocity(-speed,0f);
                     left_center_right = -1;
+                    reset_stats();//unnecessary but more for understanding purposes
+                    //justChanged =true;
+                    isRunning = true;
                 }
 
                 player_body.applyForceToCenter( speed*left_center_right,0,true );
@@ -295,6 +405,14 @@ public class Player {//implements InputProcessor {
 
             }
             //print("===============================");
+        }
+        else
+        {
+            if(onGround && justPressed)
+            {
+                reset_stats();//unnecessary but more for understanding purposes
+                justChanged =true;
+            }
         }
     }
 
@@ -366,8 +484,6 @@ public class Player {//implements InputProcessor {
     public float getBody_Y(){return player_body.getPosition().y;}
     public Vector2 getBody_POS(){return player_body.getPosition();}//get position
 
-
-
     public void print_position()
     {
         print(this.getClass()+"\n\tx: "+getBody_X()+"\ty: "+ getBody_Y());
@@ -390,19 +506,19 @@ public class Player {//implements InputProcessor {
             return false;
 
         //TODO: TO DELETE LATER
-        if(keycode == Input.Keys.UP)
+        if(keycode == Input.Keys.UP || keycode == Input.Keys.W)
         {
             player_body.applyAngularImpulse( 1,true );
         }
 
-        if(keycode == Input.Keys.DOWN)
+        if(keycode == Input.Keys.DOWN|| keycode == Input.Keys.S)
         {
             player_body.applyAngularImpulse( -1,true );
         }
 
         if(keycode == Input.Keys.SPACE && onGround)
         {
-            print("Trying to jump");
+            //print("Trying to jump");
             //player_body.setLinearVelocity(0f,80000f);
             //player_body.setLinearVelocity(speed*left_center_right,jump_force);
             //THIS WORKS: player_body.applyLinearImpulse( speed*left_center_right, jump_force,
@@ -410,6 +526,9 @@ public class Player {//implements InputProcessor {
 
             //player_body.applyForceToCenter( 0,jump_force,true );
             player_body.applyLinearImpulse( 0,jump_force, getBody_X(), getBody_Y(),true );
+
+            reset_stats();
+            justChanged = true;
 
             jumping= true;
             onGround = false;
@@ -475,6 +594,12 @@ public class Player {//implements InputProcessor {
 
     }
 
+    //used for animations
+    private void reset_stats()
+    {
+        isRunning= false;
+        justPressed = false;
+    }
 
     //"Called when a key was released"
     //@Override
@@ -486,7 +611,11 @@ public class Player {//implements InputProcessor {
         //print("jumping: "+ jumping +"\tOnGround: "+ onGround);
         int index = allkeysPressed.indexOf( keycode );
         if(index != -1)
+        {
             allkeysPressed.remove( index );
+            justPressed = true;
+        }
+
 
         left_center_right= 0;
 
@@ -504,35 +633,21 @@ public class Player {//implements InputProcessor {
         return true;
     }
 
-    //@Override
-    public boolean keyTyped(char character) {
-        return false;
-    }
 
+
+
+    //@Override
+    public boolean keyTyped(char character) {return false; }
     // On touch we apply force from the direction of the users touch.
     // This could result in the object "spinning".
     //@Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {return false; }
     //@Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {return false; }
     //@Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
-    }
-
+    public boolean touchDragged(int screenX, int screenY, int pointer) { return false; }
     //@Override
-    public boolean mouseMoved(int screenX, int screenY) {
-        return false;
-    }
-
+    public boolean mouseMoved(int screenX, int screenY) { return false; }
     //@Override
-    public boolean scrolled(int amount) {
-        return false;
-    }
+    public boolean scrolled(int amount) { return false; }
 }
